@@ -1,0 +1,155 @@
+---
+// src/pages/json-diff.astro
+import Layout from "../layouts/Layout.astro";
+import JsonDiff from "../components/islands/JsonDiff";
+
+const faqItems = [
+  {
+    question: "How does JSON diff/comparison work?",
+    answer: "The tool recursively compares the two JSON payloads by inspecting object keys, array indices, and value types. It analyzes changes structurally rather than comparing plain text lines, ensuring accurate detection of additions, removals, and modifications."
+  },
+  {
+    question: "Can I compare two JSON files with different key orders?",
+    answer: "Yes. Because the comparison is performed on parsed JSON objects rather than raw text lines, object keys are evaluated by name regardless of their position in the file. Properties with identical keys and values will not trigger false change warnings."
+  },
+  {
+    question: "What do the +/−/~ symbols mean in the diff output?",
+    answer: "The green + symbol indicates a new key or value added in JSON B that was missing in JSON A. The red − symbol represents a key or value removed in JSON B. The amber ~ symbol denotes an existing key whose value or data type was modified between the two versions."
+  }
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqItems.map((f) => ({
+    "@type": "Question",
+    "name": f.question,
+    "acceptedAnswer": { "@type": "Answer", "text": f.answer },
+  })),
+};
+---
+
+<Layout
+  title="JSON Diff — Compare Two JSON Objects Online | QuietJSON"
+  description="Compare two JSON objects side by side and see every difference. Added, removed, and changed keys highlighted with full JSONPath. 100% client-side."
+  canonical="https://quietjson.com/json-diff"
+>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-8">
+    <!-- Heading -->
+    <div style="margin-bottom: 16px;">
+      <h1 style="font-size: clamp(20px, 4.5vw, 24px); font-weight: 600; letter-spacing: -0.4px; color: var(--color-ink); margin: 0 0 6px 0; line-height: 1.3; word-break: break-word;">
+        JSON Diff — Compare Two JSON Objects
+      </h1>
+      <p style="font-size: 14px; color: var(--color-body); margin: 0; line-height: 1.5;">
+        Paste two JSON snippets and instantly see what's added, removed, or changed — with full JSONPath.
+      </p>
+    </div>
+
+    <!-- Island -->
+    <div class="island-shell">
+      <div class="island-skeleton" aria-hidden="true">
+        <div class="skel-toolbar"></div>
+        <div class="skel-body"></div>
+      </div>
+      <JsonDiff client:only="preact" />
+    </div>
+  </div>
+
+  <!-- ── SEO content ─────────────────────────────────────────────── -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
+    <div style="max-width: 760px;">
+
+      <section style="margin-bottom: 48px;">
+        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Why Use a JSON Diff Tool?
+        </h2>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0 0 12px 0;">
+          When working with API responses, configuration files, or database records, spotting what changed
+          between two versions of a JSON document can be tedious. A plain text diff shows too much noise —
+          line numbers, whitespace differences, quote styles. A JSON-aware diff ignores formatting and
+          focuses only on semantic differences in the data.
+        </p>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0;">
+          This tool performs a recursive deep comparison and shows every difference with its
+          <strong>JSONPath</strong> — so you know exactly where in a 500-key object the change happened.
+          Differences are color-coded: <span style="color:#16a34a; font-weight:500;">green for added</span>,
+          <span style="color:#dc2626; font-weight:500;">red for removed</span>, and
+          <span style="color:#b45309; font-weight:500;">amber for changed values</span>.
+        </p>
+      </section>
+
+      <section style="margin-bottom: 48px;">
+        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Common Use Cases
+        </h2>
+        <ul style="font-size: 14px; color: var(--color-body); line-height: 1.9; margin: 0; padding-left: 20px;">
+          <li><strong>API debugging</strong> — compare a request body that worked vs one that failed</li>
+          <li><strong>Config review</strong> — diff a staging vs production config before deployment</li>
+          <li><strong>Data migration</strong> — verify a record before and after transformation</li>
+          <li><strong>Code review aid</strong> — quickly understand what a JSON fixture change means</li>
+          <li><strong>Schema drift</strong> — catch when an API starts returning extra or missing fields</li>
+        </ul>
+      </section>
+
+      <section style="margin-bottom: 48px;">
+        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          How to Use
+        </h2>
+        <ol style="font-size: 14px; color: var(--color-body); line-height: 1.9; margin: 0; padding-left: 20px;">
+          <li>Paste your first JSON into the <strong>JSON A</strong> panel (original / before).</li>
+          <li>Paste your second JSON into the <strong>JSON B</strong> panel (modified / after).</li>
+          <li>Click <strong>Compare JSON</strong>.</li>
+          <li>Review the color-coded diff results below — each entry shows the path and old/new values.</li>
+        </ol>
+      </section>
+
+      <section style="margin-bottom: 48px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin: 0 0 20px 0;">
+          Frequently Asked Questions
+        </h2>
+        <div style="display: flex; flex-direction: column; gap: 0;">
+          {faqItems.map((item, i) => (
+            <details
+              style={`
+                border-top: 1px solid var(--color-hairline);
+                ${i === faqItems.length - 1 ? "border-bottom: 1px solid var(--color-hairline);" : ""}
+              `}
+            >
+              <summary style="
+                padding: 16px 4px;
+                font-size: 15px;
+                font-weight: 500;
+                color: var(--color-ink);
+                cursor: pointer;
+                list-style: none;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                user-select: none;
+              ">
+                <h3 style="font-size: 15px; font-weight: 500; margin: 0; color: inherit;">
+                  {item.question}
+                </h3>
+                <span style="font-size: 18px; color: var(--color-mute); flex-shrink: 0; font-weight: 300; transition: transform 0.15s;">+</span>
+              </summary>
+              <p style="
+                margin: 0;
+                padding: 0 4px 16px;
+                font-size: 14px;
+                color: var(--color-body);
+                line-height: 1.7;
+              ">
+                {item.answer}
+              </p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+    </div>
+  </div>
+</Layout>
+

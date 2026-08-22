@@ -1,0 +1,139 @@
+---
+// src/pages/json-to-yaml.astro
+import Layout from "../layouts/Layout.astro";
+import JsonToYaml from "../components/islands/JsonToYaml";
+
+const faqItems = [
+  {
+    question: "What is the difference between JSON and YAML?",
+    answer: "JSON uses strict delimiter syntax with braces {} and brackets [] for structure, making it ideal for machine-to-machine data interchange. YAML uses indentation and whitespace, making it more concise and easier for humans to read and edit in configuration files (such as Docker, Kubernetes, and CI/CD pipelines)."
+  },
+  {
+    question: "Can I convert YAML back to JSON too?",
+    answer: "Yes. You can click the \"⇄ Flip Direction\" button in the toolbar to switch the tool to YAML-to-JSON mode. This allows you to paste YAML configuration snippets and instantly convert them into valid, formatted JSON."
+  },
+  {
+    question: "Does this tool preserve comments when converting?",
+    answer: "Because standard JSON specifications do not support comments, converting YAML containing comments into JSON will strip those comments during parsing. When converting from JSON to YAML, the output is generated cleanly from the parsed data structures."
+  }
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqItems.map((f) => ({
+    "@type": "Question",
+    "name": f.question,
+    "acceptedAnswer": { "@type": "Answer", "text": f.answer },
+  })),
+};
+---
+
+<Layout
+  title="JSON to YAML Converter — Free Online Tool | QuietJSON"
+  description="Convert JSON to YAML instantly online. Supports reverse YAML to JSON too. 100% client-side using js-yaml — your data never leaves the browser."
+  canonical="https://quietjson.com/json-to-yaml"
+>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-8">
+    <!-- Heading -->
+    <div style="margin-bottom: 16px;">
+      <h1 style="font-size: clamp(20px, 4.5vw, 24px); font-weight: 600; letter-spacing: -0.4px; color: var(--color-ink); margin: 0 0 6px 0; line-height: 1.3; word-break: break-word;">
+        JSON to YAML Converter
+      </h1>
+      <p style="font-size: 14px; color: var(--color-body); margin: 0; line-height: 1.5;">
+        Convert JSON to YAML (or YAML back to JSON) instantly — flip direction with one click.
+      </p>
+    </div>
+
+    <!-- Island -->
+    <div class="island-shell">
+      <div class="island-skeleton" aria-hidden="true">
+        <div class="skel-toolbar"></div>
+        <div class="skel-body"></div>
+      </div>
+      <JsonToYaml client:only="preact" />
+    </div>
+  </div>
+
+  <!-- ── SEO content ─────────────────────────────────────────────── -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
+    <div style="max-width: 760px;">
+
+      <section style="margin-bottom: 48px;">
+        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Why Convert JSON to YAML?
+        </h2>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0 0 12px 0;">
+          JSON is the preferred format for APIs and data exchange, but YAML is the go-to format for
+          configuration files. Docker Compose, Kubernetes manifests, GitHub Actions workflows, Ansible
+          playbooks, and many CI/CD tools all use YAML because it's far more readable — no curly braces,
+          no quotes for simple strings, and natural nesting through indentation.
+        </p>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0;">
+          This tool converts in both directions. Need to pull a value from a Kubernetes YAML into a JSON
+          API payload? Flip the direction and convert back in seconds.
+        </p>
+      </section>
+
+      <section style="margin-bottom: 48px;">
+        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          How to Use
+        </h2>
+        <ol style="font-size: 14px; color: var(--color-body); line-height: 1.9; margin: 0; padding-left: 20px;">
+          <li>Paste your JSON (or YAML) into the left input panel.</li>
+          <li>Select your conversion direction using the <strong>⇄ Flip Direction</strong> button.</li>
+          <li>Click <strong>Convert to YAML</strong> (or <strong>Convert to JSON</strong>).</li>
+          <li>Copy the output or download it as a file.</li>
+        </ol>
+      </section>
+
+      <section style="margin-bottom: 48px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin: 0 0 20px 0;">
+          Frequently Asked Questions
+        </h2>
+        <div style="display: flex; flex-direction: column; gap: 0;">
+          {faqItems.map((item, i) => (
+            <details
+              style={`
+                border-top: 1px solid var(--color-hairline);
+                ${i === faqItems.length - 1 ? "border-bottom: 1px solid var(--color-hairline);" : ""}
+              `}
+            >
+              <summary style="
+                padding: 16px 4px;
+                font-size: 15px;
+                font-weight: 500;
+                color: var(--color-ink);
+                cursor: pointer;
+                list-style: none;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                user-select: none;
+              ">
+                <h3 style="font-size: 15px; font-weight: 500; margin: 0; color: inherit;">
+                  {item.question}
+                </h3>
+                <span style="font-size: 18px; color: var(--color-mute); flex-shrink: 0; font-weight: 300; transition: transform 0.15s;">+</span>
+              </summary>
+              <p style="
+                margin: 0;
+                padding: 0 4px 16px;
+                font-size: 14px;
+                color: var(--color-body);
+                line-height: 1.7;
+              ">
+                {item.answer}
+              </p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+    </div>
+  </div>
+</Layout>
+

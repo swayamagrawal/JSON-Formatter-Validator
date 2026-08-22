@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://quietjson.com/sitemap-index.xml

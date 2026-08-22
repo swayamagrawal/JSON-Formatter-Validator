@@ -1,0 +1,236 @@
+---
+// src/pages/json-repair.astro
+import Layout from "../layouts/Layout.astro";
+import JsonEditor from "../components/islands/JsonEditor";
+
+const pageTitle = "Fix Broken JSON Online Free — JSON Repair Tool for ChatGPT/LLM Output";
+const pageDesc = "Instantly fix broken JSON from ChatGPT, Claude, or any LLM. Repairs trailing commas, single quotes, unquoted keys, comments & more. Free, no signup, 100% browser-based.";
+const canonical = "https://quietjson.com/json-repair";
+
+const faqItems = [
+  {
+    question: "Why is my JSON invalid or broken?",
+    answer: "JSON parsing errors typically occur due to subtle syntax mistakes. The most common issues include trailing commas after the last item, single quotes instead of double quotes around strings, unquoted object keys, JavaScript comments, or Python constants like True, False, or None."
+  },
+  {
+    question: "Can this tool fix JSON copied from ChatGPT or other AI tools?",
+    answer: "Yes. Large language models like ChatGPT, Claude, and Gemini frequently generate conversational JSON containing markdown wrappers, trailing commas, single quotes, or missing brackets. QuietJSON's repair engine is specifically optimized to fix these common AI output issues."
+  },
+  {
+    question: "What kinds of errors can the repair tool fix?",
+    answer: "The repair tool automatically fixes unquoted keys, trailing commas in objects and arrays, single-quoted strings, JavaScript comments (// and /* */), Python boolean/null constants, missing closing brackets, and misplaced string escapes."
+  },
+  {
+    question: "Will repairing change my actual data/values?",
+    answer: "No. The repair algorithm only corrects the surrounding syntax and formatting required to make the JSON specification-compliant. It preserves your original keys, string contents, numeric values, and object structures without altering your underlying data."
+  }
+];
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDesc}
+  canonical={canonical}
+>
+  <!-- FAQ Schema.org JSON-LD for rich snippets -->
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqItems.map(f => ({
+      "@type": "Question",
+      "name": f.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": f.answer
+      }
+    }))
+  })} />
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-8">
+
+    <!-- ── 1. H1 + 1 sentence ─────────────────────────────────────────── -->
+    <div style="margin-bottom: 16px;">
+      <h1 style="
+        font-size: clamp(20px, 4.5vw, 24px);
+        font-weight: 600;
+        letter-spacing: -0.7px;
+        color: var(--color-ink);
+        margin: 0 0 4px 0;
+        line-height: 1.25;
+        word-break: break-word;
+      ">
+        Fix Broken JSON Online — Free JSON Repair Tool
+      </h1>
+      <p style="margin: 0; font-size: 14px; color: var(--color-body); line-height: 1.45;">
+        Paste your JSON below and click <strong style="color: var(--color-ink);">🔧 Repair</strong> — trailing commas, single quotes, unquoted keys, LLM output all fixed instantly.
+      </p>
+    </div>
+
+    <!-- ── 2. The Tool — immediately visible, above the fold ────────────── -->
+    <div class="island-shell">
+      <div class="island-skeleton" aria-hidden="true">
+        <div class="skel-toolbar"></div>
+        <div class="skel-body"></div>
+      </div>
+      <JsonEditor
+        client:only="preact"
+        inputPlaceholder={`{\n  name: 'broken example',\n  trailing: 'comma',\n}`}
+      />
+    </div>
+
+    <!-- ── 3. SEO content BELOW the tool ────────────────────────────────── -->
+
+    <!-- Detailed description paragraphs -->
+    <div style="margin-top: 48px; max-width: 760px;">
+      <div style="font-size: 15px; color: var(--color-body); line-height: 1.7; display: flex; flex-direction: column; gap: 12px;">
+        <p style="margin: 0;">
+          Our tool automatically detects and corrects the most common JSON errors — including
+          <strong style="color: var(--color-ink);">trailing commas</strong>, <strong style="color: var(--color-ink);">single quotes</strong>,
+          <strong style="color: var(--color-ink);">unquoted keys</strong>, JavaScript-style comments,
+          and Python-style <code style="font-family: var(--font-mono); font-size: 13px; background: var(--color-canvas-soft-2); padding: 1px 5px; border-radius: 3px;">True/False/None</code> values.
+        </p>
+
+        <p style="margin: 0;">
+          Specifically designed to <strong style="color: var(--color-ink);">fix JSON output from ChatGPT, Claude, Gemini, or any LLM</strong>.
+          AI models are great at generating content but often produce slightly malformed JSON —
+          a trailing comma here, single quotes there. Instead of manually hunting for the error,
+          paste it here and let the repair engine fix it in milliseconds.
+          The pre-filled example above shows exactly the kind of LLM output this tool excels at fixing.
+        </p>
+
+        <p style="margin: 0;">
+          All processing is <strong style="color: var(--color-ink);">100% browser-based — your JSON never leaves your device</strong>.
+          No server uploads, no accounts, no size limits. Works entirely offline after the page loads.
+          Need to validate, format, or explore your fixed JSON as a tree?
+          Use the <strong>Format</strong> and <strong>🌳 Tree</strong> buttons after repairing.
+        </p>
+      </div>
+    </div>
+
+    <!-- How it works: 3-step cards -->
+    <div style="margin-top: 32px; max-width: 760px;">
+      <h2 style="font-size: 16px; font-weight: 600; color: var(--color-ink); margin: 0 0 16px 0; letter-spacing: -0.3px;">
+        How it works
+      </h2>
+      <div style="
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      " class="how-it-works-grid">
+        {[
+          { step: "1", icon: "📋", title: "Paste", desc: "Paste your broken JSON into the input panel — or drag & drop a .json file." },
+          { step: "2", icon: "🔧", title: "Click Repair", desc: "Click the amber Repair button. Errors are auto-detected and fixed instantly." },
+          { step: "3", icon: "✅", title: "Copy & Use", desc: "Copy the fixed JSON or download it. Switch to Tree view to explore the structure." },
+        ].map(item => (
+          <div style="
+            padding: 16px;
+            background: var(--color-canvas);
+            border: 1px solid var(--color-hairline);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-2);
+          ">
+            <div style="font-size: 20px; margin-bottom: 6px;">{item.icon}</div>
+            <div style="font-size: 12px; font-weight: 600; color: var(--color-mute); font-family: var(--font-mono); margin-bottom: 4px; letter-spacing: 0.5px;">
+              STEP {item.step}
+            </div>
+            <div style="font-size: 14px; font-weight: 600; color: var(--color-ink); margin-bottom: 4px;">{item.title}</div>
+            <div style="font-size: 13px; color: var(--color-body); line-height: 1.5;">{item.desc}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Internal link → homepage -->
+    <div style="
+      margin-top: 32px;
+      max-width: 760px;
+      padding: 16px 20px;
+      background: var(--color-canvas);
+      border: 1px solid var(--color-hairline);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    ">
+      <span style="font-size: 14px; color: var(--color-body);">
+        Need the full JSON formatter, validator, and tree viewer?
+      </span>
+      <a
+        href="/"
+        style="
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--color-link);
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+        "
+      >
+        Try our main JSON tool →
+      </a>
+    </div>
+
+    <!-- FAQ Section -->
+    <section style="margin-top: 48px; max-width: 760px;" aria-label="Frequently asked questions">
+      <h2 style="
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--color-ink);
+        margin: 0 0 24px 0;
+        letter-spacing: -0.4px;
+      ">
+        Frequently Asked Questions
+      </h2>
+
+      <div style="display: flex; flex-direction: column; gap: 0;">
+        {faqItems.map((item, i) => (
+          <details
+            style={`
+              border-top: 1px solid var(--color-hairline);
+              ${i === faqItems.length - 1 ? "border-bottom: 1px solid var(--color-hairline);" : ""}
+            `}
+          >
+            <summary style="
+              padding: 16px 4px;
+              font-size: 15px;
+              font-weight: 500;
+              color: var(--color-ink);
+              cursor: pointer;
+              list-style: none;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 16px;
+              user-select: none;
+            ">
+              {item.question}
+              <span style="font-size: 18px; color: var(--color-mute); flex-shrink: 0; font-weight: 300;">+</span>
+            </summary>
+            <p style="
+              margin: 0;
+              padding: 0 4px 16px;
+              font-size: 14px;
+              color: var(--color-body);
+              line-height: 1.7;
+            ">
+              {item.answer}
+            </p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+  </div>
+
+  <style>
+    @media (max-width: 640px) {
+      .how-it-works-grid { grid-template-columns: 1fr !important; }
+    }
+    details summary::-webkit-details-marker { display: none; }
+    details[open] summary span { transform: rotate(45deg); display: inline-block; }
+  </style>
+
+</Layout>

@@ -1,0 +1,224 @@
+---
+// src/pages/about.astro
+import Layout from "../layouts/Layout.astro";
+
+const faqItems = [
+  {
+    question: "Who built QuietJSON and why?",
+    answer: "QuietJSON was created by developers who needed fast, distraction-free JSON utilities without annoying ads, tracking scripts, or server-side processing risks. The goal is to provide a clean, reliable, and privacy-first toolset for developers worldwide."
+  },
+  {
+    question: "How is my data kept private if it's a free tool?",
+    answer: "QuietJSON is designed with a strict zero-backend architecture. All formatting, validation, repair, and conversion algorithms execute locally in your web browser. No server receives your data, and no third-party tracking or advertising scripts are loaded."
+  },
+  {
+    question: "Is QuietJSON open source?",
+    answer: "QuietJSON is built entirely on well-tested open-source libraries, including Astro, Preact, CodeMirror 6, jsonrepair, and js-yaml. It is designed to be transparent, lightweight, and accessible to everyone for free."
+  }
+];
+---
+
+<Layout
+  title="About QuietJSON — Free, Private JSON Tools"
+  description="QuietJSON is a free collection of privacy-first JSON tools that run 100% in your browser. No uploads, no servers, no tracking — your data stays yours."
+  canonical="https://quietjson.com/about"
+>
+  <!-- FAQ Schema.org JSON-LD for rich snippets -->
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqItems.map(f => ({
+      "@type": "Question",
+      "name": f.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": f.answer
+      }
+    }))
+  })} />
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-16">
+
+    <!-- Heading -->
+    <div style="margin-bottom: 40px; max-width: 680px;">
+      <h1 style="font-size: clamp(20px, 4.5vw, 24px); font-weight: 600; letter-spacing: -0.4px; color: var(--color-ink); margin: 0 0 10px 0; line-height: 1.3; word-break: break-word;">
+        About QuietJSON
+      </h1>
+      <p style="font-size: 15px; color: var(--color-body); margin: 0; line-height: 1.65;">
+        Free, privacy-first JSON tools that run entirely in your browser.
+      </p>
+    </div>
+
+    <div style="max-width: 680px; display: flex; flex-direction: column; gap: 40px;">
+
+      <!-- Origin / Mission -->
+      <section>
+        <h2 style="font-size: 17px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          What is QuietJSON?
+        </h2>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.8; margin: 0 0 12px 0;">
+          QuietJSON is a collection of free JSON tools built for developers who care about their data.
+          Most JSON tools on the web upload your JSON to a server to process it — even if just for a
+          moment, your API keys, database records, and private configs travel over the network and touch
+          someone else's machine.
+        </p>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.8; margin: 0;">
+          QuietJSON is different. Every tool — formatting, validation, repair, conversion, diff — runs
+          100% inside your browser using JavaScript. <strong style="color: var(--color-ink);">Your JSON
+          never leaves your device.</strong> There is no backend. There are no logs. There is nothing
+          to breach.
+        </p>
+      </section>
+
+      <!-- Privacy section -->
+      <section style="
+        padding: 20px 22px;
+        border: 1px solid var(--color-hairline);
+        border-radius: var(--radius-md);
+        background: var(--color-canvas-soft);
+      ">
+        <h2 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 10px 0; display: flex; align-items: center; gap: 8px;">
+          <span>🔒</span> Why privacy matters for JSON tools
+        </h2>
+        <p style="font-size: 13.5px; color: var(--color-body); line-height: 1.8; margin: 0 0 10px 0;">
+          JSON is rarely just sample data. It's often API responses containing auth tokens, database
+          exports with customer records, or config files with credentials. Pasting this into a random
+          online tool is a real security risk — even if the site looks trustworthy.
+        </p>
+        <p style="font-size: 13.5px; color: var(--color-body); line-height: 1.8; margin: 0;">
+          With QuietJSON, you can verify this yourself. Open DevTools → Network tab → use any tool.
+          You'll see zero outbound requests for your JSON data. The code is the proof.
+        </p>
+      </section>
+
+      <!-- Tools list -->
+      <section>
+        <h2 style="font-size: 17px; font-weight: 600; color: var(--color-ink); margin: 0 0 16px 0;">
+          All Tools
+        </h2>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          {[
+            {
+              href: "/",
+              name: "JSON Formatter & Validator",
+              desc: "Format, minify, and validate JSON with syntax highlighting and inline error markers.",
+            },
+            {
+              href: "/json-repair",
+              name: "JSON Repair",
+              desc: "Auto-fix broken JSON — trailing commas, unquoted keys, single quotes, LLM output, and more.",
+            },
+            {
+              href: "/json-to-csv",
+              name: "JSON to CSV Converter",
+              desc: "Convert a JSON array of objects to CSV. Nested objects are flattened with dot notation.",
+            },
+            {
+              href: "/json-to-yaml",
+              name: "JSON ↔ YAML Converter",
+              desc: "Convert JSON to YAML or YAML back to JSON — bidirectional with one click.",
+            },
+            {
+              href: "/json-diff",
+              name: "JSON Diff",
+              desc: "Compare two JSON objects side by side. Added, removed, and changed fields are color-coded with full JSONPath.",
+            },
+          ].map(tool => (
+            <a
+              href={tool.href}
+              style="
+                display: block;
+                padding: 14px 16px;
+                border: 1px solid var(--color-hairline);
+                border-radius: var(--radius-md);
+                text-decoration: none;
+                background: var(--color-canvas);
+                transition: border-color 0.12s, background 0.12s;
+              "
+              class="about-tool-link"
+            >
+              <span style="font-size: 13.5px; font-weight: 600; color: var(--color-link); display: block; margin-bottom: 3px;">
+                {tool.name} →
+              </span>
+              <span style="font-size: 13px; color: var(--color-body); line-height: 1.55;">
+                {tool.desc}
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <!-- Built with -->
+      <section>
+        <h2 style="font-size: 17px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Built with
+        </h2>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.8; margin: 0 0 12px 0;">
+          QuietJSON is built with <a href="https://astro.build" target="_blank" rel="noopener" style="color: var(--color-link);">Astro</a>,
+          <a href="https://preactjs.com" target="_blank" rel="noopener" style="color: var(--color-link);">Preact</a>,
+          <a href="https://codemirror.net" target="_blank" rel="noopener" style="color: var(--color-link);">CodeMirror 6</a>,
+          and <a href="https://tailwindcss.com" target="_blank" rel="noopener" style="color: var(--color-link);">Tailwind CSS v4</a>.
+          No server-side code. Deployed as a fully static site.
+        </p>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.8; margin: 0;">
+          JSON repair is powered by the open-source
+          <a href="https://github.com/josdejong/jsonrepair" target="_blank" rel="noopener" style="color: var(--color-link);">jsonrepair</a>
+          library by Jos de Jong. YAML conversion uses
+          <a href="https://github.com/nodeca/js-yaml" target="_blank" rel="noopener" style="color: var(--color-link);">js-yaml</a>.
+        </p>
+      </section>
+
+      <!-- Frequently Asked Questions -->
+      <section>
+        <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin: 0 0 20px 0;">
+          Frequently Asked Questions
+        </h2>
+        <div style="display: flex; flex-direction: column; gap: 0;">
+          {faqItems.map((item, i) => (
+            <details
+              style={`
+                border-top: 1px solid var(--color-hairline);
+                ${i === faqItems.length - 1 ? "border-bottom: 1px solid var(--color-hairline);" : ""}
+              `}
+            >
+              <summary style="
+                padding: 16px 4px;
+                font-size: 15px;
+                font-weight: 500;
+                color: var(--color-ink);
+                cursor: pointer;
+                list-style: none;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                user-select: none;
+              ">
+                <h3 style="font-size: 15px; font-weight: 500; margin: 0; color: inherit;">
+                  {item.question}
+                </h3>
+                <span style="font-size: 18px; color: var(--color-mute); flex-shrink: 0; font-weight: 300; transition: transform 0.15s;">+</span>
+              </summary>
+              <p style="
+                margin: 0;
+                padding: 0 4px 16px;
+                font-size: 14px;
+                color: var(--color-body);
+                line-height: 1.7;
+              ">
+                {item.answer}
+              </p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .about-tool-link:hover {
+    border-color: var(--color-link) !important;
+    background: var(--color-canvas-soft) !important;
+  }
+</style>

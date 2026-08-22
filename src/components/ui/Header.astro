@@ -1,0 +1,388 @@
+---
+// src/components/ui/Header.astro
+const { pathname } = Astro.url;
+
+const coreTools = [
+  { href: "/",            label: "Formatter" },
+  { href: "/json-repair", label: "Repair"    },
+];
+
+const converterTools = [
+  { href: "/json-to-csv",  label: "CSV"  },
+  { href: "/json-to-yaml", label: "YAML" },
+  { href: "/json-diff",    label: "Diff" },
+];
+
+function isActive(href: string) {
+  return pathname === href || (href !== "/" && pathname.startsWith(href));
+}
+---
+
+<header
+  style="background-color: var(--color-canvas); border-bottom: 1px solid var(--color-hairline);"
+  class="sticky top-0 z-50 h-14"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center gap-4 sm:gap-6">
+
+    <!-- ── Logo ────────────────────────────────────────────────── -->
+    <a
+      href="/"
+      class="flex items-center gap-2.5 no-underline flex-shrink-0"
+      aria-label="QuietJSON home"
+    >
+      <svg viewBox="0 0 64 64" width="36" height="36" style="color: var(--color-ink); flex-shrink: 0;" aria-hidden="true">
+        <path d="M32 8 L52 16 V38 Q52 54 32 60 Q12 54 12 38 V16 Z" fill="none" stroke="#2563eb" stroke-width="4" stroke-linejoin="round"/>
+        <text x="32" y="41" text-anchor="middle" font-family="ui-monospace, monospace" font-weight="700" font-size="20" fill="currentColor">&#123; &#125;</text>
+      </svg>
+      <span style="font-size: 15.5px; font-weight: 650; letter-spacing: -0.3px; color: var(--color-ink);">
+        Quiet<span style="color: var(--color-link);">JSON</span>
+      </span>
+    </a>
+
+    <!-- ── Nav (desktop) ────────────────────────────────────────── -->
+    <nav class="hidden md:flex items-center gap-1 flex-1" aria-label="Main navigation">
+
+      <!-- Core tools: Formatter + Repair -->
+      {coreTools.map(item => (
+        <a
+          href={item.href}
+          class={`hdr-link ${isActive(item.href) ? "hdr-link--active" : ""}`}
+          aria-current={isActive(item.href) ? "page" : undefined}
+        >
+          {item.label}
+        </a>
+      ))}
+
+      <!-- Visual separator between groups -->
+      <div class="hdr-sep"></div>
+
+      <!-- Converter tools: CSV + YAML + Diff -->
+      {converterTools.map(item => (
+        <a
+          href={item.href}
+          class={`hdr-link ${isActive(item.href) ? "hdr-link--active" : ""}`}
+          aria-current={isActive(item.href) ? "page" : undefined}
+        >
+          {item.label}
+        </a>
+      ))}
+
+      <!-- Spacer pushes right-side items to the far end -->
+      <div style="flex: 1;"></div>
+
+      <!-- Privacy badge — 🔒 100% client-side (lg+ only, subtle) -->
+      <span
+        class="hidden lg:inline-flex items-center gap-1.5 mr-2"
+        style="font-size: 11px; font-family: var(--font-mono); color: var(--color-mute);"
+        title="All processing happens in your browser — no data is sent to any server"
+      >
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        100% client-side
+      </span>
+
+      <!-- Separator before toggle -->
+      <div class="hdr-sep"></div>
+
+      <!-- Theme toggle -->
+      <button
+        id="theme-toggle"
+        aria-label="Toggle dark/light mode"
+        style="
+          background: transparent;
+          color: var(--color-mute);
+          border: none;
+          width: 32px;
+          height: 32px;
+          border-radius: var(--radius-sm);
+          cursor: pointer;
+        "
+        class="flex items-center justify-center hdr-icon-btn"
+      >
+        <svg id="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg id="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: none;">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
+    </nav>
+
+    <!-- ── Mobile: Theme toggle + Hamburger menu ──────────────── -->
+    <div class="md:hidden flex items-center gap-1.5 ml-auto">
+      <!-- Mobile theme toggle -->
+      <button
+        id="theme-toggle-mobile"
+        aria-label="Toggle dark/light mode"
+        style="background: transparent; color: var(--color-mute); border: none; width: 34px; height: 34px; border-radius: var(--radius-sm); cursor: pointer;"
+        class="flex items-center justify-center hdr-icon-btn"
+      >
+        <svg id="icon-sun-m" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg id="icon-moon-m" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: none;">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
+      <!-- Mobile menu hamburger button -->
+      <button
+        id="mobile-menu-btn"
+        aria-label="Toggle navigation menu"
+        aria-expanded="false"
+        aria-controls="mobile-nav-dropdown"
+        style="background: transparent; color: var(--color-ink); border: 1px solid var(--color-hairline); width: 34px; height: 34px; border-radius: var(--radius-sm); cursor: pointer;"
+        class="flex items-center justify-center hdr-icon-btn"
+      >
+        <!-- ☰ Hamburger Icon -->
+        <svg id="icon-menu-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <!-- ✕ Close Icon -->
+        <svg id="icon-menu-close" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: none;">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ── Mobile Dropdown Menu ──────────────────────────────────────── -->
+  <div
+    id="mobile-nav-dropdown"
+    class="hidden md:hidden"
+    style="
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background-color: var(--color-canvas);
+      border-bottom: 1px solid var(--color-hairline);
+      box-shadow: var(--shadow-2, 0 10px 25px -5px rgba(0, 0, 0, 0.3));
+      padding: 10px 16px 16px;
+      z-index: 50;
+    "
+  >
+    <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-mute); margin-bottom: 6px; padding: 4px 8px;">
+      Tools &amp; Converters
+    </div>
+    <nav class="flex flex-col gap-1" aria-label="Mobile navigation">
+      {[...coreTools, ...converterTools, { href: "/about", label: "About" }].map(item => (
+        <a
+          href={item.href}
+          class={`mobile-nav-link ${isActive(item.href) ? "mobile-nav-link--active" : ""}`}
+          aria-current={isActive(item.href) ? "page" : undefined}
+        >
+          <span>{item.label}</span>
+          {isActive(item.href) && (
+            <span style="font-size: 11px; color: var(--color-link); font-family: var(--font-mono);">Current</span>
+          )}
+        </a>
+      ))}
+    </nav>
+
+    <!-- Mobile Privacy badge -->
+    <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--color-hairline); display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px; font-family: var(--font-mono); color: var(--color-mute);">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      </svg>
+      100% Client-Side — Private &amp; Secure
+    </div>
+  </div>
+</header>
+
+<!-- Theme script & Mobile Menu handler -->
+<script is:inline>
+  (function () {
+    var STORAGE_KEY = "jsoncraft-theme";
+
+    function getPreferred() {
+      var stored = localStorage.getItem(STORAGE_KEY);
+      if (stored === "light" || stored === "dark") return stored;
+      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+
+    function applyTheme(theme) {
+      var html = document.documentElement;
+      theme === "dark" ? html.classList.add("dark") : html.classList.remove("dark");
+
+      var pairs = [
+        ["icon-sun",   "icon-moon"],
+        ["icon-sun-m", "icon-moon-m"],
+      ];
+      pairs.forEach(function(p) {
+        var sun  = document.getElementById(p[0]);
+        var moon = document.getElementById(p[1]);
+        if (sun && moon) {
+          sun.style.display  = theme === "dark" ? "block" : "none";
+          moon.style.display = theme === "dark" ? "none"  : "block";
+        }
+      });
+
+      localStorage.setItem(STORAGE_KEY, theme);
+    }
+
+    applyTheme(getPreferred());
+
+    document.addEventListener("DOMContentLoaded", function () {
+      // Theme toggle listeners
+      ["theme-toggle", "theme-toggle-mobile"].forEach(function(id) {
+        var btn = document.getElementById(id);
+        if (btn) {
+          btn.addEventListener("click", function () {
+            var cur = document.documentElement.classList.contains("dark") ? "dark" : "light";
+            applyTheme(cur === "dark" ? "light" : "dark");
+          });
+        }
+      });
+
+      // Mobile Hamburger Menu toggle
+      var menuBtn = document.getElementById("mobile-menu-btn");
+      var dropdown = document.getElementById("mobile-nav-dropdown");
+      var iconOpen = document.getElementById("icon-menu-open");
+      var iconClose = document.getElementById("icon-menu-close");
+
+      if (menuBtn && dropdown && iconOpen && iconClose) {
+        function toggleMenu(forceClose) {
+          var isExpanded = menuBtn.getAttribute("aria-expanded") === "true";
+          var shouldOpen = forceClose ? false : !isExpanded;
+
+          menuBtn.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+          if (shouldOpen) {
+            dropdown.classList.remove("hidden");
+            iconOpen.style.display = "none";
+            iconClose.style.display = "block";
+          } else {
+            dropdown.classList.add("hidden");
+            iconOpen.style.display = "block";
+            iconClose.style.display = "none";
+          }
+        }
+
+        menuBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          toggleMenu();
+        });
+
+        // Close when clicking outside
+        document.addEventListener("click", function (e) {
+          if (!dropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+            toggleMenu(true);
+          }
+        });
+
+        // Close on ESC key
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") {
+            toggleMenu(true);
+          }
+        });
+
+        // Close when link clicked
+        dropdown.querySelectorAll("a").forEach(function (link) {
+          link.addEventListener("click", function () {
+            toggleMenu(true);
+          });
+        });
+
+        // Close on resize > 768px (desktop)
+        window.addEventListener("resize", function () {
+          if (window.innerWidth >= 768) {
+            toggleMenu(true);
+          }
+        });
+      }
+    });
+  })();
+</script>
+
+<style>
+  /* ── Nav link base (desktop) ────────────────────────────────── */
+  .hdr-link {
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-mute);
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: color 0.1s, background 0.12s;
+    white-space: nowrap;
+  }
+
+  .hdr-link:hover {
+    color: var(--color-ink);
+    background: var(--color-canvas-soft-2);
+  }
+
+  /* Active / current page */
+  .hdr-link--active {
+    color: var(--color-ink);
+    font-weight: 600;
+    background: var(--color-canvas-soft-2);
+  }
+
+  /* Vertical separator between groups */
+  .hdr-sep {
+    width: 1px;
+    height: 18px;
+    background: var(--color-hairline);
+    margin: 0 10px;
+    flex-shrink: 0;
+  }
+
+  /* Icon button (theme toggle / hamburger) */
+  .hdr-icon-btn:hover {
+    background: var(--color-canvas-soft-2) !important;
+    color: var(--color-ink) !important;
+  }
+
+  /* Mobile Nav Links */
+  .mobile-nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 12px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--color-body);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: background 0.1s, color 0.1s;
+  }
+
+  .mobile-nav-link:hover {
+    background: var(--color-canvas-soft-2);
+    color: var(--color-ink);
+  }
+
+  .mobile-nav-link--active {
+    background: var(--color-canvas-soft-2);
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+</style>

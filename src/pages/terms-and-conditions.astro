@@ -1,0 +1,146 @@
+---
+// src/pages/terms-and-conditions.astro
+import Layout from "../layouts/Layout.astro";
+
+const pageTitle = "Terms and Conditions | QuietJSON";
+const pageDesc = "Terms and Conditions for using QuietJSON. Read about service terms, acceptable use, intellectual property, and limitations of liability.";
+const canonical = "https://quietjson.com/terms-and-conditions";
+const lastUpdated = "August 2026";
+---
+
+<Layout title={pageTitle} description={pageDesc} canonical={canonical}>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-16">
+
+    <!-- Heading -->
+    <div style="margin-bottom: 32px; max-width: 680px;">
+      <h1 style="
+        font-size: clamp(20px, 4.5vw, 24px);
+        font-weight: 600;
+        letter-spacing: -0.4px;
+        color: var(--color-ink);
+        margin: 0 0 8px 0;
+        line-height: 1.3;
+        word-break: break-word;
+      ">
+        Terms and Conditions
+      </h1>
+      <p style="font-size: 14px; color: var(--color-mute); margin: 0;">
+        Last updated: {lastUpdated}
+      </p>
+    </div>
+
+    <div style="max-width: 680px; display: flex; flex-direction: column; gap: 32px;">
+
+      <!-- Introduction -->
+      <section>
+        <h2 style="font-size: 17px; font-weight: 600; color: var(--color-ink); margin: 0 0 10px 0;">
+          1. Acceptance of Terms
+        </h2>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.8; margin: 0;">
+          By accessing or using QuietJSON (<a href="https://quietjson.com" style="color: var(--color-link); text-decoration: none;">quietjson.com</a>), you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, you should discontinue use of the website.
+        </p>
+      </section>
+
+      <!-- 2. Service Description -->
+      <section>
+        <h2 style="font-size: 17px; font-weight: 600; color: var(--color-ink); margin: 0 0 10px 0;">
+          2. Service Description &amp; "As-Is" Provision
+        </h2>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.8; margin: 0;">
+          QuietJSON provides free browser-based developer utilities including JSON formatting, syntax validation, automated error repair, data conversions (CSV, YAML), and visual diff comparison. All services are provided strictly on an <strong>"as-is"</strong> and <strong>"as-available"</strong> basis without fees, subscriptions, or warranties of any kind.
+        </p>
+      </section>
+
+      <!-- 3. No Warranty -->
+      <section>
+        <h2 style="font-size: 17px; font-weight: 600; color: var(--color-ink); margin: 0 0 10px 0;">
+          3. Disclaimer of Warranty &amp; Data Verification
+        </h2>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.8; margin: 0 0 10px 0;">
+          While we strive for high precision and reliability, QuietJSON makes no express or implied representations or warranties that tool outputs will be entirely free of errors, bugs, or omissions.
+        </p>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.8; margin: 0;">
+          Users are responsible for verifying all formatted, repaired, or converted data before applying it in production, mission-critical databases, financial systems, or security configurations.
+        </p>
+      </section>
+
+      <!-- 4. Acceptable Use -->
+      <section>
+        <h2 style="font-size: 17px; font-weight: 600; color: var(--color-ink); margin: 0 0 10px 0;">
+          4. Acceptable Use Policy
+        </h2>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.8; margin: 0 0 10px 0;">
+          You agree not to use QuietJSON for any unlawful purpose or in violation of any applicable regulations. Prohibited actions include:
+        </p>
+        <ul style="font-size: 14px; color: var(--color-body); line-height: 1.9; margin: 0; padding-left: 20px;">
+          <li>Attempting to disrupt, degrade, or flood the website hosting infrastructure (e.g., denial of service attacks).</li>
+          <li>Scraping or abusing the site through excessive automated mechanisms designed to circumvent normal usage.</li>
+          <li>Distributing malware, viruses, or harmful code through the platform.</li>
+        </ul>
+      </section>
+
+      <!-- 5. Intellectual Property -->
+      <section>
+        <h2 style="font-size: 17px; font-weight: 600; color: var(--color-ink); margin: 0 0 10px 0;">
+          5. Intellectual Property &amp; Open Source
+        </h2>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.8; margin: 0 0 10px 0;">
+          The QuietJSON name, logos, website layout, visual assets, and original code are the intellectual property of QuietJSON.
+        </p>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.8; margin: 0;">
+          QuietJSON incorporates open-source libraries (including CodeMirror, jsonrepair, and js-yaml), each governed by their respective open-source licenses (MIT/BSD). Your ownership of any JSON or data you input into the tool remains 100% yours.
+        </p>
+      </section>
+
+      <!-- 6. Changes to Service -->
+      <section>
+        <h2 style="font-size: 17px; font-weight: 600; color: var(--color-ink); margin: 0 0 10px 0;">
+          6. Modifications to Service and Terms
+        </h2>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.8; margin: 0;">
+          We reserve the right to modify, update, enhance, or discontinue any feature or part of the service at any time without prior notice. Continued use of the website following any changes constitutes acceptance of the revised Terms.
+        </p>
+      </section>
+
+      <!-- 7. Limitation of Liability -->
+      <section>
+        <h2 style="font-size: 17px; font-weight: 600; color: var(--color-ink); margin: 0 0 10px 0;">
+          7. Limitation of Liability
+        </h2>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.8; margin: 0;">
+          To the fullest extent permitted by law, QuietJSON and its maintainers shall not be liable for any direct, indirect, incidental, consequential, or punitive damages, including data loss, business interruption, or financial losses arising from the use or inability to use this service.
+        </p>
+      </section>
+
+      <!-- 8. Contact -->
+      <section style="
+        padding: 20px 22px;
+        border: 1px solid var(--color-hairline);
+        border-radius: var(--radius-md);
+        background: var(--color-canvas);
+      ">
+        <h2 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 8px 0;">
+          Contact Regarding Terms
+        </h2>
+        <p style="font-size: 13.5px; color: var(--color-body); line-height: 1.7; margin: 0 0 10px 0;">
+          For inquiries or questions concerning these Terms and Conditions:
+        </p>
+        <a
+          href="mailto:hello@quietjson.com"
+          style="
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--color-link);
+            text-decoration: none;
+          "
+        >
+          ✉ hello@quietjson.com →
+        </a>
+      </section>
+
+    </div>
+  </div>
+</Layout>

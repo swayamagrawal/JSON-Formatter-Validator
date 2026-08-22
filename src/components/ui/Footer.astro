@@ -1,0 +1,53 @@
+---
+// src/components/ui/Footer.astro
+const currentYear = new Date().getFullYear();
+---
+
+<footer
+  style="background-color: var(--color-canvas); border-top: 1px solid var(--color-hairline); color: var(--color-body);"
+  class="mt-auto"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+
+      <!-- Left: branding + tagline -->
+      <div class="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
+        <svg viewBox="0 0 64 64" width="22" height="22" style="color: var(--color-ink); flex-shrink: 0;" aria-hidden="true">
+          <path d="M32 8 L52 16 V38 Q52 54 32 60 Q12 54 12 38 V16 Z" fill="none" stroke="#2563eb" stroke-width="4" stroke-linejoin="round"/>
+          <text x="32" y="41" text-anchor="middle" font-family="ui-monospace, monospace" font-weight="700" font-size="20" fill="currentColor">&#123; &#125;</text>
+        </svg>
+        <span style="font-size: 13px; color: var(--color-mute);">
+          © {currentYear} <strong style="color: var(--color-body);">QuietJSON</strong> — Free JSON tools, 100% in your browser.
+        </span>
+      </div>
+
+      <!-- Right: links -->
+      <nav aria-label="Footer navigation">
+        <ul class="flex flex-wrap items-center justify-center sm:justify-end gap-x-4 gap-y-2 list-none m-0 p-0">
+          {[
+            { label: "JSON Formatter", href: "/" },
+            { label: "JSON Repair", href: "/json-repair" },
+            { label: "JSON to CSV", href: "/json-to-csv" },
+            { label: "JSON to YAML", href: "/json-to-yaml" },
+            { label: "JSON Diff", href: "/json-diff" },
+            { label: "About", href: "/about" },
+            { label: "Privacy Policy", href: "/privacy-policy" },
+            { label: "Terms", href: "/terms-and-conditions" },
+            { label: "Contact", href: "/contact" },
+          ].map(link => (
+            <li>
+              <a
+                href={link.href}
+                style="font-size: 13px; color: var(--color-mute); text-decoration: none;"
+                class="hover:opacity-70 transition-opacity"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+    </div>
+  </div>
+</footer>

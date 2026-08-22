@@ -1,0 +1,157 @@
+---
+// src/pages/500.astro
+import Layout from "../layouts/Layout.astro";
+
+const quickTools = [
+  { href: "/", label: "JSON Formatter", desc: "Format & validate JSON" },
+  { href: "/json-repair", label: "JSON Repair", desc: "Fix broken LLM output" },
+  { href: "/json-diff", label: "JSON Diff", desc: "Compare two JSON objects" },
+];
+---
+
+<Layout
+  title="500 - Something Went Wrong | QuietJSON"
+  description="An unexpected server error occurred."
+  noIndex={true}
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-20 flex flex-col items-center justify-center text-center">
+
+    <!-- 500 Visual Glyph -->
+    <div style="
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 16px;
+      background: var(--color-canvas-soft);
+      border: 1px solid var(--color-hairline);
+      border-radius: var(--radius-md);
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      color: #ef4444;
+      margin-bottom: 24px;
+      letter-spacing: -0.5px;
+    ">
+      &#123; status: 500 &#125;
+    </div>
+
+    <!-- Main Heading -->
+    <h1 style="
+      font-size: clamp(24px, 5vw, 36px);
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      color: var(--color-ink);
+      margin: 0 0 12px 0;
+      line-height: 1.25;
+    ">
+      500 — Something Went Wrong
+    </h1>
+
+    <p style="
+      font-size: 15px;
+      color: var(--color-body);
+      max-width: 480px;
+      line-height: 1.65;
+      margin: 0 0 28px 0;
+    ">
+      An unexpected error occurred while loading this resource. Please try refreshing the page.
+    </p>
+
+    <!-- Action Buttons Row -->
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 48px;">
+      <a
+        href="/"
+        style="
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 22px;
+          background: var(--color-link);
+          color: #ffffff;
+          font-size: 14px;
+          font-weight: 600;
+          border-radius: var(--radius-md);
+          text-decoration: none;
+          box-shadow: var(--shadow-1);
+          transition: opacity 0.15s, transform 0.15s;
+        "
+        class="hover:opacity-90 active:scale-95"
+      >
+        ← Back to Homepage
+      </a>
+
+      <button
+        onclick="window.location.reload()"
+        style="
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 20px;
+          background: var(--color-canvas);
+          color: var(--color-ink);
+          border: 1px solid var(--color-hairline);
+          font-size: 14px;
+          font-weight: 500;
+          border-radius: var(--radius-md);
+          cursor: pointer;
+          transition: background 0.15s, border-color 0.15s;
+        "
+        class="hover:bg-zinc-800"
+      >
+        ↻ Reload Page
+      </button>
+    </div>
+
+    <!-- Quick Links -->
+    <div style="max-width: 600px; width: 100%; text-align: left;">
+      <h2 style="
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--color-mute);
+        margin: 0 0 14px 0;
+        text-align: center;
+      ">
+        Popular tools:
+      </h2>
+
+      <div class="error-tools-grid" style="
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+      ">
+        {quickTools.map(tool => (
+          <a
+            href={tool.href}
+            style="
+              display: block;
+              padding: 14px 16px;
+              background: var(--color-canvas);
+              border: 1px solid var(--color-hairline);
+              border-radius: var(--radius-md);
+              text-decoration: none;
+              transition: border-color 0.15s, background 0.15s;
+            "
+            class="error-tool-card"
+          >
+            <span style="font-size: 14px; font-weight: 600; color: var(--color-ink); display: block; margin-bottom: 2px;">
+              {tool.label} →
+            </span>
+            <span style="font-size: 12.5px; color: var(--color-mute);">
+              {tool.desc}
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+
+  </div>
+
+  <style>
+    .error-tool-card:hover {
+      border-color: var(--color-link) !important;
+      background: var(--color-canvas-soft) !important;
+    }
+  </style>
+</Layout>

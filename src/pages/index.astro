@@ -1,0 +1,458 @@
+---
+// src/pages/index.astro
+import Layout from "../layouts/Layout.astro";
+import JsonEditor from "../components/islands/JsonEditor";
+
+const faqItems = [
+  {
+    question: "What is a JSON formatter?",
+    answer: "A JSON formatter is a tool that takes minified, compressed, or messy JSON text and reformats it with clean hierarchical indentation (such as 2 spaces, 4 spaces, or tabs) and line breaks. This makes the data human-readable and much easier to debug, edit, and share."
+  },
+  {
+    question: "What is a JSON validator?",
+    answer: "A JSON validator analyzes your text to ensure it strictly conforms to the official RFC 8259 JSON syntax rules. If any syntax errors exist—such as missing quotes, trailing commas, or unmatched brackets—the validator pinpoints the exact line and column number of the issue."
+  },
+  {
+    question: "What is JSON used for?",
+    answer: "JSON stands for JavaScript Object Notation. It is a lightweight, text-based data interchange format widely used for sending data between web servers and clients, configuring software applications, storing document data, and communicating with REST and GraphQL APIs."
+  },
+  {
+    question: "How do I format a JSON file?",
+    answer: "To format a JSON file, paste your raw JSON text into the input panel or click the Upload button to load a .json file from your device. QuietJSON immediately parses the data and formats it with your chosen indentation level."
+  },
+  {
+    question: "How do I validate JSON?",
+    answer: "Validation happens automatically as you type or paste text into QuietJSON. Any syntax errors are highlighted in the editor with red error markers and line numbers, and the bottom status bar indicates whether the payload is valid."
+  },
+  {
+    question: "How do I create a JSON file?",
+    answer: "You can create a JSON file by formatting your data in QuietJSON and clicking the Download button in the output panel. Alternatively, save any valid JSON string in a text editor with a .json file extension and UTF-8 encoding."
+  },
+  {
+    question: "Does QuietJSON support JSON Schema validation?",
+    answer: "QuietJSON provides real-time JSON syntax validation against RFC 8259 rules. It does not validate custom structural JSON Schema definitions (such as draft-07 or 2020-12 object constraints), focusing instead on fast, error-free formatting and syntax checking."
+  },
+  {
+    question: "How do I add a JSON formatter in Notepad++?",
+    answer: "In Notepad++, you can format JSON by installing a plugin like JSTool or JSON Viewer via the Plugins Admin menu. In contrast, QuietJSON runs directly in any modern browser without needing plugin installations, admin permissions, or software updates."
+  },
+  {
+    question: "What makes QuietJSON a good JSON formatter?",
+    answer: "QuietJSON runs 100% client-side in your browser, meaning your data never leaves your computer. It features instant format switching (2 spaces, 4 spaces, tabs), intelligent error repair, an interactive Tree View, and zero advertisements or rate limits."
+  },
+  {
+    question: "Is my JSON data uploaded anywhere or stored on a server?",
+    answer: "No. All parsing, formatting, validation, and tree rendering take place entirely inside your browser using local JavaScript. No data, API keys, or text snippets are ever transmitted over the network or saved to any remote server."
+  },
+  {
+    question: "Is QuietJSON completely free to use without limits?",
+    answer: "Yes, QuietJSON is completely free to use. There are no account registration requirements, paywalls, daily usage quotas, or hidden fees."
+  }
+];
+---
+
+<Layout
+  title="Free Online JSON Formatter & Validator | QuietJSON"
+  description="Format, validate, and auto-repair JSON online for free. 100% private and client-side pretty JSON formatter with tree view, minify, and instant syntax validation."
+  canonical="https://quietjson.com/"
+>
+  <!-- FAQ Schema.org JSON-LD for rich snippets -->
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqItems.map(f => ({
+      "@type": "Question",
+      "name": f.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": f.answer
+      }
+    }))
+  })} />
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-12">
+
+    <!-- Page heading -->
+    <div style="margin-bottom: 16px;">
+      <h1 style="
+        font-size: clamp(20px, 4.5vw, 24px);
+        font-weight: 600;
+        letter-spacing: -0.7px;
+        color: var(--color-ink);
+        margin: 0 0 4px 0;
+        line-height: 1.25;
+        word-break: break-word;
+      ">
+        Free Online JSON Formatter &amp; Validator
+      </h1>
+      <p style="
+        font-size: 14px;
+        color: var(--color-body);
+        margin: 0;
+        line-height: 1.45;
+      ">
+        Paste or upload raw JSON to instantly format, validate, and beautify your code. 100% free, 100% client-side — your data never leaves your browser.
+      </p>
+    </div>
+
+    <!-- JSON Editor island — client:only skips SSR (uses browser-only APIs) -->
+    <div class="island-shell">
+      <div class="island-skeleton" aria-hidden="true">
+        <div class="skel-toolbar"></div>
+        <div class="skel-body"></div>
+      </div>
+      <JsonEditor client:only="preact" />
+    </div>
+
+    <!-- ── SECTION 1: Intro / What is a JSON Formatter & Validator? ── -->
+    <section style="margin-top: 48px; max-width: 780px;" aria-labelledby="intro-heading">
+      <h2 id="intro-heading" style="
+        font-size: 21px;
+        font-weight: 600;
+        letter-spacing: -0.4px;
+        color: var(--color-ink);
+        margin: 0 0 14px 0;
+      ">
+        What is a JSON Formatter and Validator?
+      </h2>
+      <div style="font-size: 15px; color: var(--color-body); line-height: 1.75; display: flex; flex-direction: column; gap: 14px;">
+        <p style="margin: 0;">
+          A <strong style="color: var(--color-ink);">JSON formatter</strong> (often called a <em>pretty JSON formatter</em> or JSON beautifier) takes messy, unindented, or minified JSON text and structures it with clear hierarchical indentation, newlines, and color-coded syntax. When interacting with REST API endpoints, microservice logs, or database dumps, JSON data frequently arrives as an unreadable single line of text. Using a reliable <strong style="color: var(--color-ink);">json formatter online</strong> transforms that raw blob into structured, readable code in milliseconds.
+        </p>
+        <p style="margin: 0;">
+          While a formatter improves visual structure, a <strong style="color: var(--color-ink);">JSON validator</strong> performs structural syntax verification against strict RFC 8259 standards. If your JSON has a missing closing bracket, a misplaced quotation mark, or an unexpected comma, an <strong style="color: var(--color-ink);">online json validator</strong> immediately highlights the exact line and column where parsing failed, helping you inspect and debug errors without guesswork.
+        </p>
+        <p style="margin: 0;">
+          <strong style="color: var(--color-ink);">QuietJSON combines both into a single seamless tool:</strong> a high-performance <strong>free online JSON formatter tool</strong> and real-time <strong>json validator online</strong> equipped with interactive Tree View navigation and automated error recovery.
+        </p>
+      </div>
+    </section>
+
+    <!-- ── SECTION 2: Why Use an Online JSON Formatter? ─────────────── -->
+    <section style="margin-top: 48px; max-width: 780px;" aria-labelledby="why-online-heading">
+      <h2 id="why-online-heading" style="
+        font-size: 21px;
+        font-weight: 600;
+        letter-spacing: -0.4px;
+        color: var(--color-ink);
+        margin: 0 0 14px 0;
+      ">
+        Why Use an Online JSON Formatter?
+      </h2>
+      <div style="font-size: 15px; color: var(--color-body); line-height: 1.75; display: flex; flex-direction: column; gap: 14px;">
+        <p style="margin: 0;">
+          Developers often rely on desktop plugins, such as the classic <strong style="color: var(--color-ink);">Notepad++ JSON formatter</strong> (JSTool) or standalone IDE extensions, to format and inspect JSON payloads. While desktop editors are capable, they require manual installation, periodic updates, and access to a specific operating system.
+        </p>
+        <p style="margin: 0;">
+          A modern <strong style="color: var(--color-ink);">free json formatter</strong> and <strong style="color: var(--color-ink);">json validator tool</strong> like QuietJSON gives you instant access from any web browser on macOS, Windows, Linux, iPad, or mobile devices — zero setup required. Whether you are inspecting JSON responses during API debugging, testing webhook payloads, or reviewing configuration files, you get instant formatting and validation right in your browser.
+        </p>
+        <p style="margin: 0;">
+          Furthermore, in the era of artificial intelligence, developers regularly copy structured data from ChatGPT, Claude, and Gemini. AI models frequently produce malformed JSON with single quotes or trailing commas. QuietJSON serves as an intelligent <strong style="color: var(--color-ink);">AI JSON formatter</strong> and validator fixer that repairs and cleans broken outputs with a single click.
+        </p>
+      </div>
+    </section>
+
+    <!-- ── SECTION 3: Why QuietJSON (Feature Grid) ────────────────────── -->
+    <section style="margin-top: 48px; max-width: 780px;" aria-labelledby="why-heading">
+      <h2 id="why-heading" style="
+        font-size: 21px;
+        font-weight: 600;
+        letter-spacing: -0.4px;
+        color: var(--color-ink);
+        margin: 0 0 16px 0;
+      ">
+        Why QuietJSON is the Best JSON Formatter
+      </h2>
+      <div class="feature-grid" style="
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+      ">
+        {[
+          {
+            icon: "🔒",
+            title: "100% Private & Client-Side",
+            desc: "All formatting, linting, and tree rendering run purely in your browser's JavaScript engine. Your sensitive JSON data never leaves your computer."
+          },
+          {
+            icon: "🔧",
+            title: "Smart Auto-Repair Engine",
+            desc: "Built-in JSON validator and fixer resolves LLM mistakes, trailing commas, single-quoted strings, and Python True/False/None constants instantly."
+          },
+          {
+            icon: "⚡",
+            title: "Free, Fast & Unlimited",
+            desc: "No account signups, no daily file limits, no paywalls, and zero tracking ads to slow down your workflow."
+          },
+          {
+            icon: "🛠️",
+            title: "Complete Tool Ecosystem",
+            desc: "Beyond standard json validator code beautify capabilities, convert JSON to CSV or YAML, compare two payloads with Diff, or explore Tree View."
+          }
+        ].map(card => (
+          <div style="
+            padding: 18px;
+            background: var(--color-canvas);
+            border: 1px solid var(--color-hairline);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-1);
+          ">
+            <div style="font-size: 22px; margin-bottom: 8px;">{card.icon}</div>
+            <h3 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 6px 0;">
+              {card.title}
+            </h3>
+            <p style="font-size: 13px; color: var(--color-body); line-height: 1.55; margin: 0;">
+              {card.desc}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- ── SECTION 4: JSON Formatter Example — Before & After ─────────── -->
+    <section style="margin-top: 48px; max-width: 780px;" aria-labelledby="example-heading">
+      <h2 id="example-heading" style="
+        font-size: 21px;
+        font-weight: 600;
+        letter-spacing: -0.4px;
+        color: var(--color-ink);
+        margin: 0 0 14px 0;
+      ">
+        JSON Formatter Example — Before &amp; After
+      </h2>
+      <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.65; margin: 0 0 16px 0;">
+        Here is a practical <strong style="color: var(--color-ink);">JSON formatter example</strong> illustrating how unreadable, compressed data is transformed into clean, readable code with 2-space indentation:
+      </p>
+
+      <div class="example-grid" style="
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      ">
+        <!-- Before -->
+        <div style="
+          background: var(--color-canvas);
+          border: 1px solid var(--color-hairline);
+          border-radius: var(--radius-md);
+          overflow: hidden;
+        ">
+          <div style="
+            padding: 8px 12px;
+            background: var(--color-canvas-soft);
+            border-bottom: 1px solid var(--color-hairline);
+            font-size: 12px;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            color: var(--color-mute);
+          ">
+            Before (Minified Raw JSON)
+          </div>
+          <pre style="
+            margin: 0;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 12.5px;
+            line-height: 1.5;
+            color: var(--color-body);
+            background: var(--color-editor-bg);
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+          "><code>{`{"status":"ok","code":200,"data":{"user":{"id":42,"name":"Alice","roles":["admin","editor"]},"active":true}}`}</code></pre>
+        </div>
+
+        <!-- After -->
+        <div style="
+          background: var(--color-canvas);
+          border: 1px solid var(--color-hairline);
+          border-radius: var(--radius-md);
+          overflow: hidden;
+        ">
+          <div style="
+            padding: 8px 12px;
+            background: var(--color-canvas-soft);
+            border-bottom: 1px solid var(--color-hairline);
+            font-size: 12px;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            color: var(--color-link);
+          ">
+            After (Formatted &amp; Beautified)
+          </div>
+          <pre style="
+            margin: 0;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 12.5px;
+            line-height: 1.5;
+            color: var(--color-ink);
+            background: var(--color-editor-bg);
+            overflow-x: auto;
+          "><code>{`{
+  "status": "ok",
+  "code": 200,
+  "data": {
+    "user": {
+      "id": 42,
+      "name": "Alice",
+      "roles": [
+        "admin",
+        "editor"
+      ]
+    },
+    "active": true
+  }
+}`}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SECTION 5: Explore More Tools (Internal Links) ─────────────── -->
+    <section style="margin-top: 48px; max-width: 780px;" aria-labelledby="tools-heading">
+      <h2 id="tools-heading" style="
+        font-size: 21px;
+        font-weight: 600;
+        letter-spacing: -0.4px;
+        color: var(--color-ink);
+        margin: 0 0 16px 0;
+      ">
+        Explore More Free JSON Tools
+      </h2>
+      <div class="tool-links-grid" style="
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+      ">
+        {[
+          {
+            href: "/json-repair",
+            title: "JSON Repair Tool",
+            desc: "Instantly fix broken or invalid JSON from ChatGPT, Python dicts, single quotes, and missing brackets.",
+            badge: "Auto-Fix"
+          },
+          {
+            href: "/json-to-csv",
+            title: "JSON to CSV Converter",
+            desc: "Convert arrays of JSON objects into spreadsheet-ready CSV files with automatic dot-notation key flattening.",
+            badge: "Export"
+          },
+          {
+            href: "/json-to-yaml",
+            title: "JSON to YAML Converter",
+            desc: "Convert JSON configuration files into clean, readable YAML format with one-click bi-directional flipping.",
+            badge: "Convert"
+          },
+          {
+            href: "/json-diff",
+            title: "JSON Diff Tool",
+            desc: "Compare two JSON objects side-by-side to pinpoint added, removed, and modified values with full JSONPath.",
+            badge: "Compare"
+          }
+        ].map(tool => (
+          <a
+            href={tool.href}
+            class="tool-link-card"
+            style="
+              display: block;
+              padding: 16px 18px;
+              background: var(--color-canvas);
+              border: 1px solid var(--color-hairline);
+              border-radius: var(--radius-md);
+              text-decoration: none;
+              box-shadow: var(--shadow-1);
+              transition: border-color 0.15s, transform 0.15s;
+            "
+          >
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <h3 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0;">
+                {tool.title}
+              </h3>
+              <span style="
+                font-size: 11px;
+                font-family: var(--font-mono);
+                color: var(--color-link);
+                background: var(--color-link-bg-soft, rgba(0,112,243,0.08));
+                padding: 2px 7px;
+                border-radius: 4px;
+                font-weight: 500;
+              ">
+                {tool.badge} →
+              </span>
+            </div>
+            <p style="font-size: 13px; color: var(--color-body); line-height: 1.55; margin: 0;">
+              {tool.desc}
+            </p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- ── SECTION 6: FAQ (Visible Accordion matching JSON-LD Schema) ─── -->
+    <section style="margin-top: 48px; max-width: 780px;" aria-labelledby="faq-heading">
+      <h2 id="faq-heading" style="
+        font-size: 21px;
+        font-weight: 600;
+        letter-spacing: -0.4px;
+        color: var(--color-ink);
+        margin: 0 0 20px 0;
+      ">
+        Frequently Asked Questions
+      </h2>
+
+      <div style="display: flex; flex-direction: column; gap: 0;">
+        {faqItems.map((item, i) => (
+          <details
+            style={`
+              border-top: 1px solid var(--color-hairline);
+              ${i === faqItems.length - 1 ? "border-bottom: 1px solid var(--color-hairline);" : ""}
+            `}
+          >
+            <summary style="
+              padding: 16px 4px;
+              font-size: 15px;
+              font-weight: 500;
+              color: var(--color-ink);
+              cursor: pointer;
+              list-style: none;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 16px;
+              user-select: none;
+            ">
+              <h3 style="font-size: 15px; font-weight: 500; margin: 0; color: inherit;">
+                {item.question}
+              </h3>
+              <span style="font-size: 18px; color: var(--color-mute); flex-shrink: 0; font-weight: 300; transition: transform 0.15s;">+</span>
+            </summary>
+            <p style="
+              margin: 0;
+              padding: 0 4px 16px;
+              font-size: 14px;
+              color: var(--color-body);
+              line-height: 1.7;
+            ">
+              {item.answer}
+            </p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+  </div>
+
+  <style>
+    @media (max-width: 640px) {
+      .feature-grid,
+      .example-grid,
+      .tool-links-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+    .tool-link-card:hover {
+      border-color: var(--color-link) !important;
+      transform: translateY(-1px);
+    }
+    details summary::-webkit-details-marker { display: none; }
+    details[open] summary span { transform: rotate(45deg); display: inline-block; }
+  </style>
+</Layout>

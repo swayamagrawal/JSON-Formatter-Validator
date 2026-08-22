@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>
+    text { fill: #111318; }
+    @media (prefers-color-scheme: dark) {
+      text { fill: #ffffff; }
+    }
+  </style>
+  <path d="M32 8 L52 16 V38 Q52 54 32 60 Q12 54 12 38 V16 Z" fill="none" stroke="#2563eb" stroke-width="4" stroke-linejoin="round"/>
+  <text x="32" y="41" text-anchor="middle" font-family="ui-monospace, monospace" font-weight="700" font-size="20">&#123; &#125;</text>
+</svg>
