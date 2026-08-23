@@ -94,6 +94,83 @@ const {
       })();
     </script>
 
+    <!-- llms.txt discovery for AI engines (ChatGPT, Perplexity, Claude, Gemini) -->
+    <link rel="ai-content-info" href="https://quietjson.com/llms.txt" />
+
+    <!-- geo-fix-schema: Organization schema — AI entity recognition & brand knowledge graph -->
+    <script type="application/ld+json" is:inline>{JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "QuietJSON",
+      "url": "https://quietjson.com",
+      "logo": "https://quietjson.com/favicon-96x96.png",
+      "description": "QuietJSON is a free, 100% client-side JSON toolkit for developers. It formats, validates, minifies, auto-repairs, converts, and diffs JSON data entirely inside the browser — no data is ever uploaded to a server.",
+      "foundingDate": "2026",
+      "sameAs": [
+        "https://github.com/swayamagrawal/JSON-Formatter-Validator"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "email": "hello@quietjson.com",
+        "url": "https://quietjson.com/contact"
+      }
+    })}</script>
+
+    <!-- geo-fix-schema: WebSite schema — sitelinks & AI site identity -->
+    <script type="application/ld+json" is:inline>{JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "QuietJSON",
+      "url": "https://quietjson.com",
+      "description": "Free online JSON formatter, validator, repair, converter, and diff tools. 100% client-side, zero data upload.",
+      "inLanguage": "en",
+      "publisher": {
+        "@type": "Organization",
+        "name": "QuietJSON",
+        "url": "https://quietjson.com"
+      }
+    })}</script>
+
+    <!-- geo-fix-schema: SoftwareApplication — AI product/tool recognition -->
+    <script type="application/ld+json" is:inline>{JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "QuietJSON",
+      "url": "https://quietjson.com",
+      "applicationCategory": "DeveloperApplication",
+      "applicationSubCategory": "JSON Tools",
+      "operatingSystem": "All — runs in any modern web browser",
+      "description": "QuietJSON is a free, private JSON toolkit that formats, validates, minifies, auto-repairs, converts (JSON to CSV, JSON to YAML), and diffs JSON data. All processing is 100% client-side — no data leaves the browser.",
+      "featureList": [
+        "JSON Formatter with 2-space, 4-space, and tab indentation",
+        "Real-time JSON validator with error line numbers",
+        "AI JSON repair — fixes ChatGPT, Claude, Gemini output errors",
+        "Interactive Tree View for nested JSON exploration",
+        "JSON minifier for production payloads",
+        "JSON to CSV converter with dot-notation key flattening",
+        "JSON to YAML converter (bi-directional)",
+        "JSON diff tool with JSONPath change tracking",
+        "File upload and download support",
+        "Zero server uploads — 100% client-side processing"
+      ],
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      },
+      "softwareVersion": "1.0",
+      "datePublished": "2026-08-22",
+      "inLanguage": "en",
+      "isAccessibleForFree": true,
+      "provider": {
+        "@type": "Organization",
+        "name": "QuietJSON",
+        "url": "https://quietjson.com"
+      }
+    })}</script>
+
     <!-- Named slot: pages can inject JSON-LD, extra meta, etc. -->
     <slot name="head" />
   </head>

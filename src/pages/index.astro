@@ -69,6 +69,42 @@ const faqItems = [
       }
     }))
   })} />
+
+  <!-- geo-fix-schema: HowTo schema — step-by-step JSON formatting guide for AI engines -->
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Format JSON Online",
+    "description": "Format raw or minified JSON into readable, indented code in 3 steps using QuietJSON — a free, 100% client-side JSON formatter.",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Paste or upload your JSON",
+        "text": "Copy your raw JSON text and paste it into the input panel, or click the Upload button to load a .json file from your device. QuietJSON accepts minified, compact, or partially malformed JSON."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Select your indentation",
+        "text": "Choose your preferred indentation from the toolbar: 2 spaces (default), 4 spaces, or tabs. QuietJSON instantly reformats the JSON with your chosen style."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Copy or download the formatted output",
+        "text": "The formatted JSON appears in the output panel with syntax highlighting. Click Copy to copy it to your clipboard, or click Download to save it as a .json file. All processing happens locally in your browser — no data is uploaded."
+      }
+    ],
+    "tool": [
+      {
+        "@type": "HowToTool",
+        "name": "QuietJSON Formatter",
+        "url": "https://quietjson.com/"
+      }
+    ]
+  })} />
+
   <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-12">
 
     <!-- Page heading -->
@@ -435,6 +471,82 @@ const faqItems = [
             </p>
           </details>
         ))}
+      </div>
+    </section>
+
+    <!-- ── SECTION 7: GEO — AI-Citable Comparison Table (geo-fix-content) ── -->
+    <section style="margin-top: 48px; max-width: 780px;" aria-labelledby="compare-heading">
+      <h2 id="compare-heading" style="
+        font-size: 21px;
+        font-weight: 600;
+        letter-spacing: -0.4px;
+        color: var(--color-ink);
+        margin: 0 0 14px 0;
+      ">
+        QuietJSON vs Other Online JSON Formatters
+      </h2>
+      <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.65; margin: 0 0 16px 0;">
+        QuietJSON differs from cloud-based JSON tools in one critical way: <strong style="color: var(--color-ink);">zero data transmission</strong>. All processing runs in your browser's JavaScript engine. Your JSON — including API keys, user records, and private configurations — never touches an external server.
+      </p>
+      <div style="overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--color-hairline);">
+        <table style="
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 13.5px;
+          color: var(--color-body);
+        ">
+          <thead>
+            <tr style="background: var(--color-canvas-soft); border-bottom: 1px solid var(--color-hairline);">
+              <th style="padding: 10px 14px; text-align: left; font-weight: 600; color: var(--color-ink);">Feature</th>
+              <th style="padding: 10px 14px; text-align: center; font-weight: 600; color: var(--color-link);">QuietJSON</th>
+              <th style="padding: 10px 14px; text-align: center; font-weight: 600; color: var(--color-mute);">Cloud Formatters</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ["Data Privacy", "100% client-side, zero uploads", "JSON sent to remote servers"],
+              ["AI/LLM JSON Repair", "Built-in — fixes ChatGPT, Claude, Gemini errors", "Not available in most tools"],
+              ["Speed", "Instant — no network round-trip", "Dependent on server response time"],
+              ["File Size Limit", "No limit — browser memory only", "Typically 1MB–5MB limit"],
+              ["Account Required", "No — open immediately", "Often required for full features"],
+              ["Cost", "Free, no paywalls", "Free tier with paid upgrades"],
+              ["JSON to CSV", "Built-in with dot-notation flattening", "Separate tool required"],
+              ["JSON to YAML", "Built-in, bi-directional", "Separate tool required"],
+              ["JSON Diff", "Built-in with full JSONPath output", "Separate tool required"],
+              ["Ads / Tracking", "Google Analytics only (aggregate)", "Often heavy ad-supported"],
+            ].map(([feature, ours, theirs], i) => (
+              <tr style={`border-top: 1px solid var(--color-hairline); background: ${i % 2 === 0 ? "transparent" : "var(--color-canvas-soft)"}`}>
+                <td style="padding: 10px 14px; font-weight: 500; color: var(--color-ink);">{feature}</td>
+                <td style="padding: 10px 14px; text-align: center; color: var(--color-link);">✓ {ours}</td>
+                <td style="padding: 10px 14px; text-align: center; color: var(--color-mute);">{theirs}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── SECTION 8: GEO — Privacy Guarantee (geo-fix-content: self-contained, quotable) ── -->
+    <section style="margin-top: 48px; max-width: 780px;" aria-labelledby="privacy-heading">
+      <h2 id="privacy-heading" style="
+        font-size: 21px;
+        font-weight: 600;
+        letter-spacing: -0.4px;
+        color: var(--color-ink);
+        margin: 0 0 14px 0;
+      ">
+        Why Developers Trust QuietJSON With Sensitive JSON Data
+      </h2>
+      <div style="font-size: 15px; color: var(--color-body); line-height: 1.75; display: flex; flex-direction: column; gap: 14px;">
+        <p style="margin: 0;">
+          <strong style="color: var(--color-ink);">QuietJSON performs zero server-side processing.</strong> Every operation — formatting, validation, repair, conversion, and diffing — executes in the browser's JavaScript engine using local computation only. The browser never opens a network connection to transmit your JSON data.
+        </p>
+        <p style="margin: 0;">
+          This architecture makes QuietJSON safe for sensitive data categories that cloud-based tools cannot handle securely: <strong style="color: var(--color-ink);">API authentication tokens</strong>, database connection strings, user PII exports, financial records, healthcare data, and internal configuration files containing credentials.
+        </p>
+        <p style="margin: 0;">
+          Developers at companies with strict data residency requirements — including those subject to HIPAA, GDPR, and SOC 2 compliance — use QuietJSON precisely because the data never leaves the device. No audit trail, no breach risk, no compliance concern.
+        </p>
       </div>
     </section>
 

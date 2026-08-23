@@ -2,3 +2,7 @@ User-agent: *
 Allow: /
 
 Sitemap: https://quietjson.com/sitemap-index.xml
+
+# AI Crawler Context Files
+# llms.txt: https://quietjson.com/llms.txt
+# llms-full.txt: https://quietjson.com/llms-full.txt

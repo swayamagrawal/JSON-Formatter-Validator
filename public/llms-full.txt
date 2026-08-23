@@ -1,0 +1,160 @@
+﻿# QuietJSON
+
+> QuietJSON is a free, 100% client-side JSON toolkit for developers. It formats, validates, minifies, auto-repairs, converts, and diffs JSON data entirely inside the browser — no data is ever uploaded to a server. Built for developers who work with REST APIs, LLM outputs, and data pipelines where privacy matters.
+
+QuietJSON processes all JSON operations using local JavaScript execution in the browser. It supports 5 specialized tools: a formatter/validator, an AI JSON repair engine, a JSON-to-CSV converter, a JSON-to-YAML converter, and a JSON diff tool. The site is completely free with no account registration, no rate limits, and no data storage.
+
+---
+
+## Tools
+
+### JSON Formatter & Validator
+https://quietjson.com/
+
+QuietJSON is a free online JSON formatter and validator that runs 100% client-side in any modern browser. It takes raw, minified, or malformed JSON and transforms it into clean, indented, readable code with real-time syntax validation.
+
+Key Features:
+- Format JSON with 2-space, 4-space, or tab indentation — switchable instantly
+- Real-time validation against RFC 8259 JSON syntax rules
+- Error highlighting with exact line and column numbers
+- Interactive Tree View for exploring nested JSON structures
+- Minify (compact) JSON for production use
+- File upload (.json files) and copy-paste support
+- Download formatted output as a .json file
+- 100% client-side — no data leaves the browser
+
+What is a JSON Formatter?
+A JSON formatter takes minified, compressed, or messy JSON text and restructures it with clear hierarchical indentation and line breaks. This makes API responses, database exports, and configuration files human-readable for debugging and editing.
+
+What is a JSON Validator?
+A JSON validator checks whether text strictly conforms to the RFC 8259 JSON specification. It detects syntax errors including missing commas, mismatched brackets, unquoted keys, trailing commas, and invalid data types.
+
+Privacy: All formatting and validation runs in the browser's JavaScript engine. No JSON data is transmitted over the network or stored on any server.
+
+---
+
+### JSON Repair Tool
+https://quietjson.com/json-repair
+
+QuietJSON's JSON repair tool automatically fixes malformed or invalid JSON, including the common errors produced by AI language models like ChatGPT, Claude, and Gemini.
+
+What it repairs:
+- Trailing commas after last array item or object property
+- Single quotes instead of double quotes around strings
+- Unquoted object keys ({name: "value"} becomes {"name": "value"})
+- Python literals: True/False/None become true/false/null
+- Missing quotes around string values
+- Missing closing brackets or braces
+- Control characters in strings
+- Line comments (// comment) and block comments (/* comment */)
+- Escaped newlines inside strings
+
+Why AI outputs are often broken JSON:
+Large language models (LLMs) like ChatGPT, Claude, Gemini, and Mistral frequently produce JSON with syntax errors. The most common errors are trailing commas (present in JavaScript but invalid in JSON) and single-quoted strings. QuietJSON's repair engine resolves these automatically without user intervention.
+
+Usage: Paste broken JSON into the input panel and click Repair. The corrected JSON appears in the output panel and can be copied or downloaded.
+
+---
+
+### JSON to CSV Converter
+https://quietjson.com/json-to-csv
+
+QuietJSON's JSON to CSV converter transforms arrays of JSON objects into comma-separated value (CSV) format for use in Excel, Google Sheets, pandas, and other data tools.
+
+How it works:
+1. Paste a JSON array of objects into the input panel
+2. The converter automatically detects all keys across all objects
+3. Nested objects are flattened using dot notation (e.g., user.address.city)
+4. Output CSV is generated with a header row and one row per JSON object
+5. Download the result as a .csv file
+
+Privacy: Conversion runs entirely in the browser. No data is uploaded.
+
+---
+
+### JSON to YAML Converter
+https://quietjson.com/json-to-yaml
+
+QuietJSON's JSON to YAML converter provides bi-directional conversion between JSON and YAML formats.
+
+Features:
+- Convert JSON to YAML with proper YAML indentation and formatting
+- Convert YAML to JSON for use in APIs and JavaScript applications
+- One-click flip between directions
+- Supports complex nested structures, arrays, and multi-line strings
+- Output is clean, standard YAML (YAML 1.2 compatible)
+
+Common use cases:
+- Converting API JSON responses to YAML for Kubernetes or Docker Compose configs
+- Converting JSON configuration files for tools that require YAML (GitHub Actions, Ansible)
+- Converting YAML configuration back to JSON for use in JavaScript applications
+
+Privacy: All conversion runs client-side in the browser.
+
+---
+
+### JSON Diff Tool
+https://quietjson.com/json-diff
+
+QuietJSON's JSON diff tool compares two JSON objects or arrays side-by-side and identifies all differences.
+
+Output includes:
+- Added keys/values (highlighted in green)
+- Removed keys/values (highlighted in red)
+- Modified values (highlighted in yellow with before/after)
+- Full JSONPath reference for each difference (e.g., $.data.users[2].email)
+- Unchanged keys (shown for context)
+
+Common use cases:
+- Comparing API response versions to detect breaking changes
+- Auditing configuration file changes
+- Debugging why two JSON payloads produce different results
+- Reviewing LLM output changes between prompts
+
+Privacy: Both JSON inputs are processed entirely in the browser.
+
+---
+
+## About
+
+### About QuietJSON
+https://quietjson.com/about
+
+QuietJSON was built for developers who handle sensitive JSON data — API keys, user records, private configurations — and cannot risk pasting it into a cloud-based service.
+
+Core principle: Zero server-side processing. Every operation — formatting, validation, repair, conversion, and diffing — runs in the browser's JavaScript engine using local computation only.
+
+Technical architecture:
+- Built with Astro (static site generator) for zero JavaScript overhead on page load
+- UI components built with Preact for fast, lightweight interactivity
+- All JSON processing uses native browser APIs and purpose-built JavaScript parsers
+- Deployed on Cloudflare Pages global CDN for fast time-to-first-byte worldwide
+- No backend servers, no databases, no user accounts
+
+Who it's for:
+- Backend developers debugging REST API responses
+- Data engineers processing JSON exports
+- AI/ML developers fixing LLM JSON outputs
+- DevOps engineers working with JSON configuration files
+- Anyone who needs a fast, private JSON tool
+
+### Contact
+https://quietjson.com/contact
+
+Email: hello@quietjson.com
+
+QuietJSON accepts bug reports, feature requests, and business inquiries by email.
+
+---
+
+## Optional
+
+### Privacy Policy
+https://quietjson.com/privacy-policy
+
+QuietJSON collects no personally identifiable information. The site uses Google Analytics (GA4) for aggregate traffic statistics only. No JSON data entered into any tool is transmitted to QuietJSON servers — all processing is client-side. No cookies are set for tracking purposes.
+
+### Terms and Conditions
+https://quietjson.com/terms-and-conditions
+
+QuietJSON is provided as-is, free of charge. The service is available without registration. Users are responsible for ensuring their use of the tools complies with applicable laws. QuietJSON makes no warranty regarding the accuracy of JSON repair outputs.

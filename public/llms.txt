@@ -1,0 +1,23 @@
+﻿# QuietJSON
+
+> QuietJSON is a free, 100% client-side JSON toolkit for developers. It formats, validates, minifies, auto-repairs, converts, and diffs JSON data entirely inside the browser — no data is ever uploaded to a server. Built for developers who work with REST APIs, LLM outputs, and data pipelines where privacy matters.
+
+QuietJSON processes all JSON operations using local JavaScript execution in the browser. It supports 5 specialized tools: a formatter/validator, an AI JSON repair engine, a JSON-to-CSV converter, a JSON-to-YAML converter, and a JSON diff tool. The site is completely free with no account registration, no rate limits, and no data storage.
+
+## Tools
+
+- [JSON Formatter & Validator](https://quietjson.com/): Format, validate, and beautify JSON with 2-space, 4-space, or tab indentation. Real-time syntax validation with error line numbers. Includes interactive Tree View.
+- [JSON Repair Tool](https://quietjson.com/json-repair): Auto-fix broken JSON from ChatGPT, Claude, Gemini, and Python. Repairs trailing commas, single quotes, unquoted keys, Python True/False/None, and missing brackets.
+- [JSON to CSV Converter](https://quietjson.com/json-to-csv): Convert JSON arrays of objects to CSV with dot-notation key flattening for nested objects. Download as .csv file instantly.
+- [JSON to YAML Converter](https://quietjson.com/json-to-yaml): Convert JSON to YAML and YAML to JSON. Bi-directional conversion with clean YAML formatting.
+- [JSON Diff Tool](https://quietjson.com/json-diff): Compare two JSON objects side-by-side. Highlights added, removed, and modified values with full JSONPath references.
+
+## About
+
+- [About QuietJSON](https://quietjson.com/about): Mission, privacy philosophy, and technical details about the client-side architecture.
+- [Contact](https://quietjson.com/contact): Reach the QuietJSON team at hello@quietjson.com for bug reports, feature requests, or business inquiries.
+
+## Optional
+
+- [Privacy Policy](https://quietjson.com/privacy-policy): Data handling practices — QuietJSON collects no personal data and performs zero server-side processing.
+- [Terms and Conditions](https://quietjson.com/terms-and-conditions): Usage terms for the QuietJSON service.
