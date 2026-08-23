@@ -98,7 +98,8 @@ const {
     <link rel="ai-content-info" href="https://quietjson.com/llms.txt" />
 
     <!-- geo-fix-schema: Organization schema — AI entity recognition & brand knowledge graph -->
-    <script type="application/ld+json" is:inline>{JSON.stringify({
+    <script type="application/ld+json">
+    {
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "QuietJSON",
@@ -115,10 +116,12 @@ const {
         "email": "hello@quietjson.com",
         "url": "https://quietjson.com/contact"
       }
-    })}</script>
+    }
+    </script>
 
     <!-- geo-fix-schema: WebSite schema — sitelinks & AI site identity -->
-    <script type="application/ld+json" is:inline>{JSON.stringify({
+    <script type="application/ld+json">
+    {
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "QuietJSON",
@@ -130,10 +133,12 @@ const {
         "name": "QuietJSON",
         "url": "https://quietjson.com"
       }
-    })}</script>
+    }
+    </script>
 
     <!-- geo-fix-schema: SoftwareApplication — AI product/tool recognition -->
-    <script type="application/ld+json" is:inline>{JSON.stringify({
+    <script type="application/ld+json">
+    {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "QuietJSON",
@@ -169,7 +174,8 @@ const {
         "name": "QuietJSON",
         "url": "https://quietjson.com"
       }
-    })}</script>
+    }
+    </script>
 
     <!-- Named slot: pages can inject JSON-LD, extra meta, etc. -->
     <slot name="head" />
