@@ -27,6 +27,16 @@ const jsonLd = {
     "acceptedAnswer": { "@type": "Answer", "text": f.answer },
   })),
 };
+const lastUpdated = "September 2026";
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quietjson.com" },
+    { "@type": "ListItem", "position": 2, "name": "JSON to CSV Converter", "item": "https://quietjson.com/json-to-csv" }
+  ]
+};
 ---
 
 <Layout
@@ -35,6 +45,7 @@ const jsonLd = {
   canonical="https://quietjson.com/json-to-csv"
 >
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-8">
     <!-- Heading -->

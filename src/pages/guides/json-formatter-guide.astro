@@ -1,0 +1,118 @@
+﻿---
+// src/pages/guides/json-formatter-guide.astro
+import Layout from "../../layouts/Layout.astro";
+
+const pageTitle = "JSON Formatting Guide — How to Format JSON Online";
+const pageDesc = "Learn what JSON formatting is, why it matters, and how to format, validate, and beautify JSON online — free, with no upload required.";
+const canonical = "https://quietjson.com/guides/json-formatter-guide";
+const lastUpdated = "September 2026";
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quietjson.com" },
+    { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://quietjson.com/guides" },
+    { "@type": "ListItem", "position": 3, "name": "JSON Formatter Guide", "item": canonical }
+  ]
+};
+
+const articleLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": pageTitle,
+  "description": pageDesc,
+  "datePublished": "2026-09-07",
+  "dateModified": "2026-09-07",
+  "author": { "@type": "Organization", "name": "QuietJSON", "url": "https://quietjson.com" },
+  "publisher": { "@type": "Organization", "name": "QuietJSON", "url": "https://quietjson.com" },
+  "mainEntityOfPage": canonical
+};
+
+const steps = [
+  { step: "1", title: "Open a JSON formatter", desc: "Go to quietjson.com — no signup or account required." },
+  { step: "2", title: "Paste your JSON", desc: "Copy your raw JSON from an API response, config file, or clipboard and paste it into the editor." },
+  { step: "3", title: "Choose indentation", desc: "Select 2-space, 4-space, or tab indentation depending on your project style." },
+  { step: "4", title: "Click Format", desc: "Your JSON is instantly beautified. Errors are highlighted with the exact line and column number." },
+  { step: "5", title: "Copy or download", desc: "Copy the formatted JSON to clipboard or download it as a .json file." }
+];
+---
+
+<Layout title={pageTitle} description={pageDesc} canonical={canonical}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(articleLd)} />
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 pt-6 pb-16">
+
+    <nav style="font-size: 13px; color: var(--color-mute); margin-bottom: 20px;">
+      <a href="/" style="color: var(--color-link); text-decoration: none;">Home</a>
+      <span style="margin: 0 6px;">&#8250;</span>
+      <span style="color: var(--color-ink);">JSON Formatter Guide</span>
+    </nav>
+
+    <h1 style="font-size: clamp(22px, 5vw, 30px); font-weight: 700; letter-spacing: -0.5px; color: var(--color-ink); margin: 0 0 10px 0; line-height: 1.25;">
+      JSON Formatting Guide — How to Format JSON Online
+    </h1>
+    <p style="font-size: 13px; color: var(--color-mute); margin: 0 0 20px 0;">
+      Last updated: {lastUpdated} &middot; 4 min read
+    </p>
+    <p style="font-size: 15.5px; color: var(--color-body); line-height: 1.75; margin: 0 0 32px 0;">
+      JSON (JavaScript Object Notation) is the standard data format for APIs, configuration files, and data interchange. Raw API responses are often minified — a single unreadable line. Formatting makes it readable, debuggable, and shareable.
+    </p>
+
+    <h2 style="font-size: 19px; font-weight: 700; color: var(--color-ink); margin: 0 0 12px 0;">What Does Formatting JSON Mean?</h2>
+    <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.75; margin: 0 0 14px 0;">
+      Formatting (also called "pretty-printing" or "beautifying") adds line breaks and indentation to compact JSON. Minified and formatted JSON are identical in content — only presentation differs.
+    </p>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 32px;">
+      <div>
+        <p style="font-size: 11px; font-weight: 700; color: #e53e3e; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 6px 0;">Minified</p>
+        <pre style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 12px; font-size: 12px; font-family: var(--font-mono); color: var(--color-ink); white-space: pre-wrap; word-break: break-all; margin: 0;">&#123;"user":&#123;"name":"Alice","age":30&#125;&#125;</pre>
+      </div>
+      <div>
+        <p style="font-size: 11px; font-weight: 700; color: #38a169; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 6px 0;">Formatted</p>
+        <pre style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 12px; font-size: 12px; font-family: var(--font-mono); color: var(--color-ink); white-space: pre; margin: 0;">&#123;
+  "user": &#123;
+    "name": "Alice",
+    "age": 30
+  &#125;
+&#125;</pre>
+      </div>
+    </div>
+
+    <h2 style="font-size: 19px; font-weight: 700; color: var(--color-ink); margin: 0 0 14px 0;">How to Format JSON Online — Step by Step</h2>
+    <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px;">
+      {steps.map(s => (
+        <div style="display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md);">
+          <span style="flex-shrink: 0; width: 26px; height: 26px; background: var(--color-link); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">{s.step}</span>
+          <div>
+            <p style="font-size: 14px; font-weight: 700; color: var(--color-ink); margin: 0 0 3px 0;">{s.title}</p>
+            <p style="font-size: 13.5px; color: var(--color-body); margin: 0;">{s.desc}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <h2 style="font-size: 19px; font-weight: 700; color: var(--color-ink); margin: 0 0 12px 0;">Common JSON Validation Errors</h2>
+    <ul style="font-size: 14px; color: var(--color-body); line-height: 1.9; margin: 0 0 28px 0; padding-left: 20px;">
+      <li>Missing closing brace or bracket</li>
+      <li>Trailing commas after the last key-value pair</li>
+      <li>Single quotes instead of double quotes</li>
+      <li>Unquoted keys (valid in JavaScript, invalid in JSON)</li>
+      <li>Comments (// or /* */) — not permitted in JSON</li>
+    </ul>
+
+    <h2 style="font-size: 19px; font-weight: 700; color: var(--color-ink); margin: 0 0 12px 0;">Why Privacy Matters When Formatting JSON</h2>
+    <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.75; margin: 0 0 28px 0;">
+      Developers regularly paste API keys, database credentials, and user records into JSON formatters without considering where the data goes. Most online tools send it to their servers. QuietJSON processes everything in your browser — <strong style="color: var(--color-ink);">nothing is ever uploaded</strong>. The network tab stays empty.
+    </p>
+
+    <div style="padding: 20px 22px; background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); text-align: center;">
+      <p style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 8px 0;">Format your JSON now — free &amp; private</p>
+      <p style="font-size: 13.5px; color: var(--color-body); margin: 0 0 14px 0;">No signup. No server upload. Instant results.</p>
+      <a href="/" style="display: inline-block; padding: 10px 24px; background: var(--color-link); color: #fff; font-size: 14px; font-weight: 600; border-radius: var(--radius-md); text-decoration: none;">Open JSON Formatter &#8594;</a>
+    </div>
+
+  </div>
+</Layout>

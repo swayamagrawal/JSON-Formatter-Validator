@@ -1,0 +1,172 @@
+﻿---
+// src/pages/guides/how-to-fix-json-from-chatgpt.astro
+import Layout from "../../layouts/Layout.astro";
+
+const pageTitle = "How to Fix JSON from ChatGPT, Claude & Gemini";
+const pageDesc = "ChatGPT, Claude, and Gemini often generate invalid JSON. Learn the 5 most common LLM JSON errors and how to fix them instantly — free online repair tool.";
+const canonical = "https://quietjson.com/guides/how-to-fix-json-from-chatgpt";
+const lastUpdated = "September 2026";
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quietjson.com" },
+    { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://quietjson.com/guides" },
+    { "@type": "ListItem", "position": 3, "name": "How to Fix JSON from ChatGPT", "item": canonical }
+  ]
+};
+
+const articleLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": pageTitle,
+  "description": pageDesc,
+  "datePublished": "2026-09-07",
+  "dateModified": "2026-09-07",
+  "author": { "@type": "Organization", "name": "QuietJSON", "url": "https://quietjson.com" },
+  "publisher": { "@type": "Organization", "name": "QuietJSON", "url": "https://quietjson.com" },
+  "mainEntityOfPage": canonical
+};
+---
+
+<Layout title={pageTitle} description={pageDesc} canonical={canonical}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(articleLd)} />
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 pt-6 pb-16">
+
+    <nav style="font-size: 13px; color: var(--color-mute); margin-bottom: 20px;">
+      <a href="/" style="color: var(--color-link); text-decoration: none;">Home</a>
+      <span style="margin: 0 6px;">&#8250;</span>
+      <span style="color: var(--color-ink);">Fix JSON from ChatGPT</span>
+    </nav>
+
+    <h1 style="font-size: clamp(22px, 5vw, 30px); font-weight: 700; letter-spacing: -0.5px; color: var(--color-ink); margin: 0 0 10px 0; line-height: 1.25;">
+      How to Fix JSON from ChatGPT, Claude &amp; Gemini
+    </h1>
+    <p style="font-size: 13px; color: var(--color-mute); margin: 0 0 20px 0;">
+      Last updated: {lastUpdated} &middot; 5 min read
+    </p>
+    <p style="font-size: 15.5px; color: var(--color-body); line-height: 1.75; margin: 0 0 32px 0;">
+      Large language models like ChatGPT, Claude, and Gemini frequently generate JSON that looks correct but fails to parse. This guide explains the 5 most common LLM JSON errors and how to fix them — automatically or manually.
+    </p>
+
+    <!-- CTA -->
+    <div style="padding: 16px 20px; background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); margin-bottom: 36px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <p style="font-size: 14px; font-weight: 600; color: var(--color-ink); margin: 0 0 3px 0;">Fix it automatically — free</p>
+        <p style="font-size: 13px; color: var(--color-body); margin: 0;">Paste broken JSON, get valid JSON in one click. 100% private.</p>
+      </div>
+      <a href="/json-repair" style="display: inline-block; padding: 9px 18px; background: var(--color-link); color: #fff; font-size: 13.5px; font-weight: 600; border-radius: var(--radius-md); text-decoration: none; white-space: nowrap;">Try JSON Repair &#8594;</a>
+    </div>
+
+    <h2 style="font-size: 20px; font-weight: 700; color: var(--color-ink); margin: 0 0 24px 0;">The 5 Most Common LLM JSON Errors</h2>
+
+    <!-- Error 1 -->
+    <section style="margin-bottom: 36px;">
+      <h3 style="font-size: 16px; font-weight: 700; color: var(--color-ink); margin: 0 0 8px 0;">1. Trailing Commas</h3>
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.7; margin: 0 0 12px 0;">JSON does not allow a comma after the last item in an object or array. JavaScript allows it — LLMs trained on JS code frequently include them.</p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div>
+          <p style="font-size: 11px; font-weight: 700; color: #e53e3e; text-transform: uppercase; margin: 0 0 5px 0;">&#10060; Invalid</p>
+          <pre style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 10px 12px; font-size: 12px; font-family: var(--font-mono); color: var(--color-ink); white-space: pre-wrap; word-break: break-all; margin: 0;">&#123;"name": "Alice", "age": 30,&#125;</pre>
+        </div>
+        <div>
+          <p style="font-size: 11px; font-weight: 700; color: #38a169; text-transform: uppercase; margin: 0 0 5px 0;">&#10003; Valid</p>
+          <pre style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 10px 12px; font-size: 12px; font-family: var(--font-mono); color: var(--color-ink); white-space: pre-wrap; word-break: break-all; margin: 0;">&#123;"name": "Alice", "age": 30&#125;</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Error 2 -->
+    <section style="margin-bottom: 36px;">
+      <h3 style="font-size: 16px; font-weight: 700; color: var(--color-ink); margin: 0 0 8px 0;">2. Single Quotes Instead of Double Quotes</h3>
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.7; margin: 0 0 12px 0;">JSON requires double quotes for all strings and keys. Single quotes are valid in Python and JavaScript, so models sometimes output them.</p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div>
+          <p style="font-size: 11px; font-weight: 700; color: #e53e3e; text-transform: uppercase; margin: 0 0 5px 0;">&#10060; Invalid</p>
+          <pre style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 10px 12px; font-size: 12px; font-family: var(--font-mono); color: var(--color-ink); white-space: pre-wrap; word-break: break-all; margin: 0;">&#123;'name': 'Alice'&#125;</pre>
+        </div>
+        <div>
+          <p style="font-size: 11px; font-weight: 700; color: #38a169; text-transform: uppercase; margin: 0 0 5px 0;">&#10003; Valid</p>
+          <pre style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 10px 12px; font-size: 12px; font-family: var(--font-mono); color: var(--color-ink); white-space: pre-wrap; word-break: break-all; margin: 0;">&#123;"name": "Alice"&#125;</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Error 3 -->
+    <section style="margin-bottom: 36px;">
+      <h3 style="font-size: 16px; font-weight: 700; color: var(--color-ink); margin: 0 0 8px 0;">3. Python Boolean &amp; Null Values</h3>
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.7; margin: 0 0 12px 0;">Python uses True, False, and None (capitalised). JSON uses lowercase true, false, and null. LLMs trained on Python produce this constantly.</p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div>
+          <p style="font-size: 11px; font-weight: 700; color: #e53e3e; text-transform: uppercase; margin: 0 0 5px 0;">&#10060; Invalid</p>
+          <pre style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 10px 12px; font-size: 12px; font-family: var(--font-mono); color: var(--color-ink); white-space: pre-wrap; word-break: break-all; margin: 0;">&#123;"active": True, "data": None&#125;</pre>
+        </div>
+        <div>
+          <p style="font-size: 11px; font-weight: 700; color: #38a169; text-transform: uppercase; margin: 0 0 5px 0;">&#10003; Valid</p>
+          <pre style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 10px 12px; font-size: 12px; font-family: var(--font-mono); color: var(--color-ink); white-space: pre-wrap; word-break: break-all; margin: 0;">&#123;"active": true, "data": null&#125;</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Error 4 -->
+    <section style="margin-bottom: 36px;">
+      <h3 style="font-size: 16px; font-weight: 700; color: var(--color-ink); margin: 0 0 8px 0;">4. Unquoted Object Keys</h3>
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.7; margin: 0 0 12px 0;">JavaScript allows unquoted keys in object literals. JSON requires every key to be a double-quoted string.</p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div>
+          <p style="font-size: 11px; font-weight: 700; color: #e53e3e; text-transform: uppercase; margin: 0 0 5px 0;">&#10060; Invalid</p>
+          <pre style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 10px 12px; font-size: 12px; font-family: var(--font-mono); color: var(--color-ink); white-space: pre-wrap; word-break: break-all; margin: 0;">&#123;name: "Alice", age: 30&#125;</pre>
+        </div>
+        <div>
+          <p style="font-size: 11px; font-weight: 700; color: #38a169; text-transform: uppercase; margin: 0 0 5px 0;">&#10003; Valid</p>
+          <pre style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 10px 12px; font-size: 12px; font-family: var(--font-mono); color: var(--color-ink); white-space: pre-wrap; word-break: break-all; margin: 0;">&#123;"name": "Alice", "age": 30&#125;</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Error 5 -->
+    <section style="margin-bottom: 36px;">
+      <h3 style="font-size: 16px; font-weight: 700; color: var(--color-ink); margin: 0 0 8px 0;">5. Markdown Code Fences</h3>
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.7; margin: 0 0 12px 0;">ChatGPT and Claude wrap JSON in markdown code blocks for display. When copy-pasted, the backtick fences break parsing.</p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div>
+          <p style="font-size: 11px; font-weight: 700; color: #e53e3e; text-transform: uppercase; margin: 0 0 5px 0;">&#10060; Invalid</p>
+          <pre style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 10px 12px; font-size: 12px; font-family: var(--font-mono); color: var(--color-ink); white-space: pre-wrap; margin: 0;">```json
+&#123;"name": "Alice"&#125;
+```</pre>
+        </div>
+        <div>
+          <p style="font-size: 11px; font-weight: 700; color: #38a169; text-transform: uppercase; margin: 0 0 5px 0;">&#10003; Valid</p>
+          <pre style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 10px 12px; font-size: 12px; font-family: var(--font-mono); color: var(--color-ink); white-space: pre-wrap; margin: 0;">&#123;"name": "Alice"&#125;</pre>
+        </div>
+      </div>
+    </section>
+
+    <h2 style="font-size: 20px; font-weight: 700; color: var(--color-ink); margin: 0 0 16px 0;">How to Fix It — 3 Methods</h2>
+
+    <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 36px;">
+      <div style="padding: 16px 18px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md);">
+        <p style="font-size: 14px; font-weight: 700; color: var(--color-ink); margin: 0 0 6px 0;">Method 1 — Use QuietJSON Repair Tool (Fastest)</p>
+        <p style="font-size: 13.5px; color: var(--color-body); line-height: 1.7; margin: 0;">Paste your broken JSON at <a href="/json-repair" style="color: var(--color-link);">quietjson.com/json-repair</a> and click Repair. Fixes all 5 error types automatically. 100% client-side — your data never leaves your browser.</p>
+      </div>
+      <div style="padding: 16px 18px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md);">
+        <p style="font-size: 14px; font-weight: 700; color: var(--color-ink); margin: 0 0 6px 0;">Method 2 — Fix in Your Prompt</p>
+        <p style="font-size: 13.5px; color: var(--color-body); line-height: 1.7; margin: 0;">Add to your prompt: <em style="color: var(--color-ink);">"Respond with only valid RFC 8259 JSON. No markdown, no code fences, no trailing commas, no single quotes."</em></p>
+      </div>
+      <div style="padding: 16px 18px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md);">
+        <p style="font-size: 14px; font-weight: 700; color: var(--color-ink); margin: 0 0 6px 0;">Method 3 — Fix Manually</p>
+        <p style="font-size: 13.5px; color: var(--color-body); line-height: 1.7; margin: 0;">Find &amp; Replace in your editor: swap single quotes for double quotes, remove trailing commas before &#125; and ], replace True/False/None with true/false/null.</p>
+      </div>
+    </div>
+
+    <div style="padding: 20px 22px; background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); text-align: center;">
+      <p style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 8px 0;">Fix your JSON now — free</p>
+      <p style="font-size: 13.5px; color: var(--color-body); margin: 0 0 14px 0;">No signup. No upload. 100% private. Works on any LLM output.</p>
+      <a href="/json-repair" style="display: inline-block; padding: 10px 24px; background: var(--color-link); color: #fff; font-size: 14px; font-weight: 600; border-radius: var(--radius-md); text-decoration: none;">Open JSON Repair Tool &#8594;</a>
+    </div>
+
+  </div>
+</Layout>
