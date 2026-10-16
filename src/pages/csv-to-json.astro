@@ -1,0 +1,149 @@
+---
+// src/pages/csv-to-json.astro
+import Layout from "../layouts/Layout.astro";
+import CsvToJson from "../components/islands/CsvToJson";
+
+const faqItems = [
+  {
+    question: "Does QuietJSON support RFC 4180 CSV files with commas and newlines in cells?",
+    answer: "Yes. QuietJSON's CSV parser strictly complies with RFC 4180. Cells enclosed in double quotes can contain commas, escaped quotes (\"\" rendered as a single quote), and multiline text with line breaks without misaligning table columns."
+  },
+  {
+    question: "How does the converter handle numbers and boolean types?",
+    answer: "By default, QuietJSON automatically detects and parses numeric and boolean values into native JSON numbers (42, 3.14) and booleans (true, false, null). If a number exceeds JavaScript's safe integer limit (9007199254740991), it is preserved as a string to prevent precision rounding loss. You can also uncheck 'Parse numbers' or 'Parse booleans' to keep all values as strings."
+  },
+  {
+    question: "What happens if my CSV has duplicate column headers?",
+    answer: "QuietJSON automatically disambiguates duplicate column names (for example, turning repeated 'score' columns into 'score' and 'score_2') so that later columns never silently overwrite preceding data in the output JSON objects."
+  },
+  {
+    question: "Is my CSV data sent to any server?",
+    answer: "No. All conversion is executed 100% client-side inside your browser via local JavaScript. No CSV content, headers, or records are ever transmitted over the network."
+  }
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqItems.map((f) => ({
+    "@type": "Question",
+    "name": f.question,
+    "acceptedAnswer": { "@type": "Answer", "text": f.answer },
+  })),
+};
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quietjson.com" },
+    { "@type": "ListItem", "position": 2, "name": "CSV to JSON Converter", "item": "https://quietjson.com/csv-to-json/" }
+  ]
+};
+---
+
+<Layout
+  title="CSV to JSON Converter — Free Online Tool | QuietJSON"
+  description="Convert CSV files or tables to JSON array of objects instantly. RFC 4180 compliant with quoted multiline strings, auto-type detection, and 100% client-side privacy."
+  canonical="https://quietjson.com/csv-to-json/"
+>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-8">
+    <!-- Heading -->
+    <div style="margin-bottom: 16px;">
+      <h1 style="font-size: clamp(20px, 4.5vw, 24px); font-weight: 600; letter-spacing: -0.4px; color: var(--color-ink); margin: 0 0 6px 0; line-height: 1.3; word-break: break-word;">
+        CSV to JSON Converter
+      </h1>
+      <p style="font-size: 14px; color: var(--color-body); margin: 0; line-height: 1.5;">
+        Convert tabular CSV data to a structured JSON array of objects — RFC 4180 compliant with safe integer protection and zero server calls.
+      </p>
+    </div>
+
+    <!-- Island -->
+    <div class="island-shell">
+      <div class="island-skeleton" aria-hidden="true">
+        <div class="skel-toolbar"></div>
+        <div class="skel-body"></div>
+      </div>
+      <CsvToJson client:only="preact" />
+    </div>
+  </div>
+
+  <!-- SEO content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
+    <div style="max-width: 760px;">
+
+      <section style="margin-bottom: 48px;">
+        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          How CSV to JSON Conversion Works
+        </h2>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0 0 12px 0;">
+          Exporting tables from spreadsheets like Excel or Google Sheets produces CSV files, but web APIs,
+          modern applications, and databases require JSON format. QuietJSON parses the first row of your CSV
+          as column keys and converts every subsequent record into a structured JSON object.
+        </p>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0;">
+          Unlike basic split-by-comma tools, QuietJSON implements a full RFC 4180 compliant tokenizer.
+          Quoted cells with inner commas, embedded newlines, and escaped quotes (<code style="font-family: var(--font-mono); font-size: 13px; background: var(--color-canvas-soft-2); padding: 1px 5px; border-radius: 4px;">""</code>)
+          are accurately resolved without breaking rows or shifting column alignments.
+        </p>
+      </section>
+
+      <section style="margin-bottom: 48px;">
+        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          How to Use
+        </h2>
+        <ol style="font-size: 14px; color: var(--color-body); line-height: 1.9; margin: 0; padding-left: 20px;">
+          <li>Paste your CSV data into the left editor or click <strong>Upload .csv</strong> to load a file.</li>
+          <li>Choose whether to automatically parse numeric and boolean types.</li>
+          <li>Click <strong>Convert to JSON</strong> (or click <strong>Sample CSV</strong> to test with example data).</li>
+          <li>Click <strong>Copy</strong> to copy the JSON array to your clipboard, or <strong>↓ Download</strong> to save as a <code style="font-family: var(--font-mono); font-size: 13px; background: var(--color-canvas-soft-2); padding: 1px 5px; border-radius: 4px;">data.json</code> file.</li>
+        </ol>
+      </section>
+
+      <section style="margin-bottom: 48px;">
+        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Frequently Asked Questions
+        </h2>
+        <div style="display: flex; flexDirection: column; gap: 20px;">
+          {faqItems.map((item) => (
+            <div style="border-bottom: 1px solid var(--color-hairline); padding-bottom: 18px;">
+              <h3 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 8px 0;">
+                {item.question}
+              </h3>
+              <p style="font-size: 14px; color: var(--color-body); line-height: 1.7; margin: 0;">
+                {item.answer}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style="padding: 20px 24px; background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md);">
+        <h2 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 8px 0;">
+          Need the Reverse or Other Formats?
+        </h2>
+        <p style="font-size: 13px; color: var(--color-body); margin: 0 0 12px 0; line-height: 1.6;">
+          Explore QuietJSON's full suite of zero-telemetry client-side conversion tools:
+        </p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <a href="/json-to-csv/" style="font-size: 13px; color: var(--color-link); text-decoration: none; font-weight: 500;">
+            JSON to CSV →
+          </a>
+          <a href="/json-to-yaml/" style="font-size: 13px; color: var(--color-link); text-decoration: none; font-weight: 500;">
+            JSON to YAML →
+          </a>
+          <a href="/json-diff/" style="font-size: 13px; color: var(--color-link); text-decoration: none; font-weight: 500;">
+            JSON Diff →
+          </a>
+          <a href="/" style="font-size: 13px; color: var(--color-link); text-decoration: none; font-weight: 500;">
+            JSON Formatter & Validator →
+          </a>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</Layout>

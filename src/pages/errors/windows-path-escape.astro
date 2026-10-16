@@ -1,0 +1,167 @@
+---
+// src/pages/errors/windows-path-escape.astro
+import Layout from "../../layouts/Layout.astro";
+
+const pageTitle = "Fix: Windows File Path Backslash Escapes in JSON | QuietJSON";
+const pageDesc = "Why single backslashes in Windows file paths like C:\\temp or C:\\notes corrupt JSON strings. How to escape file paths correctly with double backslashes (\\\\).";
+const canonical = "https://quietjson.com/errors/windows-path-escape/";
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quietjson.com" },
+    { "@type": "ListItem", "position": 2, "name": "Error Reference", "item": "https://quietjson.com/errors/" },
+    { "@type": "ListItem", "position": 3, "name": "Windows Path Backslash Escapes", "item": canonical }
+  ]
+};
+
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Why does \"C:\\temp\" break or corrupt in JSON?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In JSON (RFC 8259), a backslash (\\) is the escape character. When followed by 't', \\t represents an ASCII horizontal tab character, not a backslash and the letter 't'. Thus, \"C:\\temp\" is parsed as 'C:' followed by a literal tab followed by 'emp'."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What happens if a Windows path has an invalid escape like \"C:\\Users\"?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "In strict JSON, \\U is an invalid escape sequence (only lowercase \\u followed by 4 hexadecimal digits is valid for unicode). A strict JSON parser will immediately throw a SyntaxError: Bad escaped character in JSON."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How should Windows file paths be formatted in JSON?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Every backslash must be doubled: \"C:\\\\Users\\\\Alice\\\\Documents\\\\file.txt\". Alternatively, modern Windows APIs and Node.js accept forward slashes: \"C:/Users/Alice/Documents/file.txt\"."
+      }
+    }
+  ]
+};
+---
+
+<Layout title={pageTitle} description={pageDesc} canonical={canonical}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+
+  <div style="max-width: 780px; width: 100%; margin: 0 auto; padding: 24px 16px 64px; box-sizing: border-box;">
+    <!-- Breadcrumb -->
+    <nav style="font-size: 13px; color: var(--color-mute); margin-bottom: 20px;">
+      <a href="/" style="color: var(--color-link); text-decoration: none;">Home</a>
+      <span style="margin: 0 6px;">&#8250;</span>
+      <a href="/errors/" style="color: var(--color-link); text-decoration: none;">Errors</a>
+      <span style="margin: 0 6px;">&#8250;</span>
+      <span style="color: var(--color-ink);">Windows Path Escapes</span>
+    </nav>
+
+    <!-- Header -->
+    <div style="margin-bottom: 28px;">
+      <div style="font-size: 12px; font-weight: 600; color: #b45309; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+        Silent Data Corruption Warning
+      </div>
+      <h1 style="font-size: clamp(22px, 5vw, 30px); font-weight: 700; letter-spacing: -0.5px; color: var(--color-ink); margin: 0 0 10px 0; line-height: 1.25;">
+        Windows File Paths &amp; Backslash Escapes in JSON
+      </h1>
+      <p style="font-size: 15px; color: var(--color-body); line-height: 1.6; margin: 0;">
+        One of the most devious JSON bugs occurs when copying Windows folder paths into configuration files. Single backslashes can turn your folder names into tabs or newlines without throwing a syntax error.
+      </p>
+    </div>
+
+    <!-- Warning Display Box -->
+    <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 16px; margin-bottom: 32px; font-family: var(--font-mono); font-size: 13px; color: #92400e; line-height: 1.5;">
+      <strong>Warning:</strong> String appears to contain a Windows file path ("C:\temp\notes.txt") where single backslashes may have been interpreted as escape sequences (\t = tab, \n = newline). Use double backslashes ("C:\\\\temp\\\\notes.txt").
+    </div>
+
+    <!-- Why it happens -->
+    <section style="margin-bottom: 36px;">
+      <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+        The "Accidental Escape" Trap
+      </h2>
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0 0 12px 0;">
+        In RFC 8259, a backslash (<code style="font-family: var(--font-mono);">\</code>) instructs the parser to treat the following character as a special control code. If a Windows folder begins with certain letters, the backslash forms a valid JSON escape:
+      </p>
+
+      <ul style="font-size: 14px; color: var(--color-body); line-height: 1.8; margin: 0 0 16px 0; padding-left: 20px;">
+        <li><code style="font-family: var(--font-mono);">C:\temp</code> &#8594; <code style="font-family: var(--font-mono);">\t</code> becomes a <strong>horizontal tab</strong>.</li>
+        <li><code style="font-family: var(--font-mono);">C:\notes</code> &#8594; <code style="font-family: var(--font-mono);">\n</code> becomes a <strong>line break (newline)</strong>.</li>
+        <li><code style="font-family: var(--font-mono);">C:\reports</code> &#8594; <code style="font-family: var(--font-mono);">\r</code> becomes a <strong>carriage return</strong>.</li>
+        <li><code style="font-family: var(--font-mono);">C:\bin</code> &#8594; <code style="font-family: var(--font-mono);">\b</code> becomes a <strong>backspace</strong>.</li>
+      </ul>
+
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0;">
+        Because <code style="font-family: var(--font-mono);">\t</code> and <code style="font-family: var(--font-mono);">\n</code> are valid JSON escape sequences, standard JSON validators report that the file is <strong>100% valid</strong>! But when your application reads the file path from configuration, the file cannot be found because the path string has been corrupted into <code style="font-family: var(--font-mono);">C:[TAB]emp</code>.
+      </p>
+    </section>
+
+    <!-- Side by Side Example -->
+    <section style="margin-bottom: 36px;">
+      <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+        Correcting Windows Paths in JSON
+      </h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <div style="background: var(--color-error-soft); border: 1px solid var(--color-error-hairline); border-radius: var(--radius-sm); padding: 14px; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.5;">
+          <div style="font-weight: 600; color: var(--color-error-deep); margin-bottom: 6px;">Corrupted (Single Backslash):</div>
+          &#123;<br />
+          &nbsp;&nbsp;"logDir": "C:\temp\logs",<br />
+          &nbsp;&nbsp;"output": "D:\notes\export.csv"<br />
+          &#125;
+        </div>
+
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-sm); padding: 14px; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.5;">
+          <div style="font-weight: 600; color: #15803d; margin-bottom: 6px;">Correct (Escaped Double Backslash):</div>
+          &#123;<br />
+          &nbsp;&nbsp;"logDir": "C:\\temp\\logs",<br />
+          &nbsp;&nbsp;"output": "D:\\notes\\export.csv"<br />
+          &#125;
+        </div>
+      </div>
+
+      <div style="padding: 12px 16px; background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); font-size: 13.5px; color: var(--color-body); line-height: 1.6;">
+        <strong>Pro Tip:</strong> Modern Windows systems (Windows 10/11, PowerShell, and Node.js) natively support forward slashes in path APIs: <code style="font-family: var(--font-mono);">"C:/temp/logs"</code> works identically and requires no backslash escaping.
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section style="margin-bottom: 40px;">
+      <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 16px 0;">
+        Frequently Asked Questions
+      </h2>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        {faqLd.mainEntity.map((item) => (
+          <div style="border-bottom: 1px solid var(--color-hairline); padding-bottom: 16px;">
+            <h3 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 6px 0;">
+              {item.name}
+            </h3>
+            <p style="font-size: 14px; color: var(--color-body); line-height: 1.7; margin: 0;">
+              {item.acceptedAnswer.text}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- QuietJSON CTA -->
+    <div style="padding: 20px; background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h4 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 4px 0;">
+          Detect silent Windows path corruption
+        </h4>
+        <p style="font-size: 13px; color: var(--color-body); margin: 0;">
+          QuietJSON proactively warns you when strings contain single-backslash Windows paths.
+        </p>
+      </div>
+      <a href="/" style="padding: 7px 16px; font-size: 13px; font-weight: 500; background: var(--color-ink); color: var(--color-canvas); border-radius: var(--radius-sm); text-decoration: none;">
+        Validate Paths &#8594;
+      </a>
+    </div>
+
+  </div>
+</Layout>

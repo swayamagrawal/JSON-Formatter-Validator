@@ -1,0 +1,180 @@
+---
+// src/pages/errors/duplicate-keys.astro
+import Layout from "../../layouts/Layout.astro";
+
+const pageTitle = "Duplicate Keys in JSON: Risks, Standards & Fixes | QuietJSON";
+const pageDesc = "Why duplicate keys in JSON objects cause silent data loss and parser discrepancies (RFC 8259). How to detect and fix duplicate properties safely.";
+const canonical = "https://quietjson.com/errors/duplicate-keys/";
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quietjson.com" },
+    { "@type": "ListItem", "position": 2, "name": "Error Reference", "item": "https://quietjson.com/errors/" },
+    { "@type": "ListItem", "position": 3, "name": "Duplicate Keys in JSON", "item": canonical }
+  ]
+};
+
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is duplicate key syntax allowed in JSON by RFC standards?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The JSON specification (RFC 8259 Section 4) explicitly states: 'The names within an object SHOULD be unique.' While grammars technically parse duplicate keys without syntax errors, the RFC warns that software receiving duplicate keys exhibits unpredictable behavior."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does JavaScript JSON.parse do when duplicate keys exist?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "JavaScript engines (V8, JavaScriptCore) follow the 'last-one-wins' rule: later key definitions silently overwrite earlier values. For example, JSON.parse('{\"id\": 1, \"id\": 2}') yields {\"id\": 2}, completely destroying the original id: 1 without any error or warning."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does QuietJSON detect duplicate keys?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "QuietJSON builds a structured AST using jsonc-parser that tracks property scopes. It flags duplicate property names and reports the exact line and column numbers of both the first and duplicate occurrences."
+      }
+    }
+  ]
+};
+---
+
+<Layout title={pageTitle} description={pageDesc} canonical={canonical}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+
+  <div style="max-width: 780px; width: 100%; margin: 0 auto; padding: 24px 16px 64px; box-sizing: border-box;">
+    <!-- Breadcrumb -->
+    <nav style="font-size: 13px; color: var(--color-mute); margin-bottom: 20px;">
+      <a href="/" style="color: var(--color-link); text-decoration: none;">Home</a>
+      <span style="margin: 0 6px;">&#8250;</span>
+      <a href="/errors/" style="color: var(--color-link); text-decoration: none;">Errors</a>
+      <span style="margin: 0 6px;">&#8250;</span>
+      <span style="color: var(--color-ink);">Duplicate Keys</span>
+    </nav>
+
+    <!-- Header -->
+    <div style="margin-bottom: 28px;">
+      <div style="font-size: 12px; font-weight: 600; color: #b45309; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+        Semantic Warning &amp; Data Loss Risk
+      </div>
+      <h1 style="font-size: clamp(22px, 5vw, 30px); font-weight: 700; letter-spacing: -0.5px; color: var(--color-ink); margin: 0 0 10px 0; line-height: 1.25;">
+        Duplicate Keys in JSON: Why They Are Dangerous
+      </h1>
+      <p style="font-size: 15px; color: var(--color-body); line-height: 1.6; margin: 0;">
+        Most JSON formatters quietly swallow duplicate object keys. But in production APIs, duplicate keys cause subtle, dangerous data corruption bugs because different programming languages interpret them inconsistently.
+      </p>
+    </div>
+
+    <!-- Warning Display Box -->
+    <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 16px; margin-bottom: 32px; font-family: var(--font-mono); font-size: 13px; color: #92400e; line-height: 1.5;">
+      <strong>Warning:</strong> Duplicate key "email" detected. This key was already defined at line 2, column 3. Parsers may inconsistently overwrite or discard duplicate values.
+    </div>
+
+    <!-- The Problem -->
+    <section style="margin-bottom: 36px;">
+      <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+        The Inconsistent Parser Trap
+      </h2>
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0 0 12px 0;">
+        Consider this simple JSON object:
+      </p>
+
+      <div style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 16px; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; margin-bottom: 14px;">
+        &#123;<br />
+        &nbsp;&nbsp;<span style="color: var(--color-error-deep);">"role": "guest"</span>,<br />
+        &nbsp;&nbsp;<span style="color: var(--color-error-deep);">"role": "admin"</span><br />
+        &#125;
+      </div>
+
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0 0 12px 0;">
+        What role does this user have? The answer depends entirely on what software reads it:
+      </p>
+
+      <ul style="font-size: 14px; color: var(--color-body); line-height: 1.8; margin: 0; padding-left: 20px;">
+        <li><strong>JavaScript (V8 / Node.js):</strong> Keeps the last key (<code style="font-family: var(--font-mono);">admin</code>).</li>
+        <li><strong>Python (<code style="font-family: var(--font-mono);">json.loads</code>):</strong> Keeps the last key (<code style="font-family: var(--font-mono);">admin</code>).</li>
+        <li><strong>Go (<code style="font-family: var(--font-mono);">encoding/json</code>):</strong> Keeps the first key or overwrites depending on struct field unmarshaling rules.</li>
+        <li><strong>Strict parsers / Linters:</strong> Reject the document as invalid.</li>
+      </ul>
+
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 12px 0 0 0;">
+        This inconsistency is an invitation for <strong>security vulnerabilities</strong>: an API gateway might validate authentication using the first key while your backend executes database operations using the second!
+      </p>
+    </section>
+
+    <!-- How to Fix -->
+    <section style="margin-bottom: 36px;">
+      <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+        How to Fix Duplicate Keys
+      </h2>
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.7; margin: 0 0 12px 0;">
+        If multiple values are intended for a single property, use an array instead of repeating the key:
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div style="background: var(--color-error-soft); border: 1px solid var(--color-error-hairline); border-radius: var(--radius-sm); padding: 14px; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.5;">
+          <div style="font-weight: 600; color: var(--color-error-deep); margin-bottom: 6px;">Bad (Duplicate Keys):</div>
+          &#123;<br />
+          &nbsp;&nbsp;"phone": "555-0100",<br />
+          &nbsp;&nbsp;"phone": "555-0199"<br />
+          &#125;
+        </div>
+
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-sm); padding: 14px; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.5;">
+          <div style="font-weight: 600; color: #15803d; margin-bottom: 6px;">Good (Array of Values):</div>
+          &#123;<br />
+          &nbsp;&nbsp;"phoneNumbers": [<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;"555-0100",<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;"555-0199"<br />
+          &nbsp;&nbsp;]<br />
+          &#125;
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section style="margin-bottom: 40px;">
+      <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 16px 0;">
+        Frequently Asked Questions
+      </h2>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        {faqLd.mainEntity.map((item) => (
+          <div style="border-bottom: 1px solid var(--color-hairline); padding-bottom: 16px;">
+            <h3 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 6px 0;">
+              {item.name}
+            </h3>
+            <p style="font-size: 14px; color: var(--color-body); line-height: 1.7; margin: 0;">
+              {item.acceptedAnswer.text}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- QuietJSON CTA -->
+    <div style="padding: 20px; background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h4 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 4px 0;">
+          Detect duplicate keys in your JSON
+        </h4>
+        <p style="font-size: 13px; color: var(--color-body); margin: 0;">
+          QuietJSON alerts you with precise line and column numbers before you commit or deploy.
+        </p>
+      </div>
+      <a href="/" style="padding: 7px 16px; font-size: 13px; font-weight: 500; background: var(--color-ink); color: var(--color-canvas); border-radius: var(--radius-sm); text-decoration: none;">
+        Check Your JSON &#8594;
+      </a>
+    </div>
+
+  </div>
+</Layout>

@@ -1,0 +1,165 @@
+---
+// src/pages/errors/index.astro
+import Layout from "../../layouts/Layout.astro";
+
+const pageTitle = "Common JSON Errors & Fixes Directory | QuietJSON";
+const pageDesc = "Diagnose and fix the most common JSON syntax errors: Unexpected token <, Python literals, duplicate keys, Windows path escapes, and trailing commas.";
+const canonical = "https://quietjson.com/errors/";
+
+const errorsList = [
+  {
+    title: "Unexpected token < in JSON at position 0",
+    slug: "unexpected-token-html",
+    code: "SyntaxError: Unexpected token '<', \"<!DOCTYPE \"...",
+    desc: "Occurs when an API endpoint returns an HTML error page (such as 404 Not Found or 500 Internal Server Error) instead of the expected JSON payload.",
+    badge: "API Response",
+  },
+  {
+    title: "Python-Style Literals (True, False, None)",
+    slug: "python-literals",
+    code: "SyntaxError: Unexpected token 'True' / 'None'",
+    desc: "Happens when copying dictionaries directly from Python, Jupyter notebooks, or Django outputs where booleans are capitalized and null is named None.",
+    badge: "Syntax Error",
+  },
+  {
+    title: "Duplicate Keys in JSON Objects",
+    slug: "duplicate-keys",
+    code: "Warning: Duplicate key \"id\" detected",
+    desc: "RFC 8259 specifies that JSON object keys should be unique. Duplicate keys cause unpredictable parser bugs where values are silently overwritten or dropped.",
+    badge: "Semantic Warning",
+  },
+  {
+    title: "Windows File Path Backslash Escapes",
+    slug: "windows-path-escape",
+    code: "Warning: Corrupted Windows path escape (\\t, \\n)",
+    desc: "Single backslashes in Windows file paths like C:\\temp or C:\\notes are interpreted as JSON escape sequences (tabs or newlines), silently corrupting file paths.",
+    badge: "Silent Corruption",
+  },
+  {
+    title: "Trailing Commas Before Closing Braces",
+    slug: "trailing-comma",
+    code: "SyntaxError: Unexpected token '}' at line X",
+    desc: "JavaScript, TypeScript, and Python permit trailing commas, but strict JSON (RFC 8259) forbids a comma after the final property in an object or array.",
+    badge: "Syntax Error",
+  },
+];
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quietjson.com" },
+    { "@type": "ListItem", "position": 2, "name": "Error Reference Directory", "item": canonical }
+  ]
+};
+
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Why do JSON parsers throw opaque syntax errors?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Standard browser and Node.js JSON.parse engines use fast C++ parsers that fail at the earliest invalid character token, often printing generic messages like 'Unexpected token' without explaining why the token is invalid in JSON."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does QuietJSON help diagnose JSON syntax errors?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "QuietJSON includes contextual diagnostics that detect HTML responses, Python literals, duplicate keys, Windows paths, and trailing commas, providing exact line/column locations and one-click automatic repairs."
+      }
+    }
+  ]
+};
+---
+
+<Layout title={pageTitle} description={pageDesc} canonical={canonical}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+
+  <div style="max-width: 840px; width: 100%; margin: 0 auto; padding: 24px 16px 64px; box-sizing: border-box;">
+    <!-- Breadcrumb -->
+    <nav style="font-size: 13px; color: var(--color-mute); margin-bottom: 20px;">
+      <a href="/" style="color: var(--color-link); text-decoration: none;">Home</a>
+      <span style="margin: 0 6px;">&#8250;</span>
+      <span style="color: var(--color-ink);">Error Reference Directory</span>
+    </nav>
+
+    <!-- Header -->
+    <div style="margin-bottom: 32px;">
+      <h1 style="font-size: clamp(24px, 5vw, 32px); font-weight: 700; letter-spacing: -0.5px; color: var(--color-ink); margin: 0 0 12px 0; line-height: 1.25;">
+        Common JSON Syntax Errors &amp; Solutions
+      </h1>
+      <p style="font-size: 15px; color: var(--color-body); line-height: 1.6; margin: 0;">
+        Detailed technical references and step-by-step resolution guides for the most frustrating errors encountered when working with JSON in web development, APIs, and modern data pipelines.
+      </p>
+    </div>
+
+    <!-- Error Cards List -->
+    <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 48px;">
+      {errorsList.map((err) => (
+        <a
+          href={`/errors/${err.slug}/`}
+          style="display: block; padding: 20px; background: var(--color-canvas); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); text-decoration: none; color: inherit; transition: border-color 0.15s, box-shadow 0.15s;"
+          class="error-card"
+        >
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px;">
+            <h2 style="font-size: 16px; font-weight: 600; color: var(--color-ink); margin: 0;">
+              {err.title}
+            </h2>
+            <span style="font-size: 11px; padding: 2px 8px; border-radius: 12px; background: var(--color-canvas-soft-2); color: var(--color-mute); font-family: var(--font-mono); flex-shrink: 0;">
+              {err.badge}
+            </span>
+          </div>
+
+          <div style="font-family: var(--font-mono); font-size: 12px; color: var(--color-error-deep); background: var(--color-error-soft); padding: 4px 8px; border-radius: 4px; margin-bottom: 10px; width: fit-content;">
+            {err.code}
+          </div>
+
+          <p style="font-size: 13.5px; color: var(--color-body); line-height: 1.6; margin: 0;">
+            {err.desc}
+          </p>
+
+          <span style="display: inline-block; margin-top: 10px; font-size: 13px; color: var(--color-link); font-weight: 500;">
+            View full diagnosis &amp; fix guide &#8594;
+          </span>
+        </a>
+      ))}
+    </div>
+
+    <!-- CTA Box -->
+    <div style="padding: 24px; background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); text-align: center;">
+      <h3 style="font-size: 17px; font-weight: 600; color: var(--color-ink); margin: 0 0 8px 0;">
+        Need to validate or auto-fix broken JSON right now?
+      </h3>
+      <p style="font-size: 14px; color: var(--color-body); margin: 0 0 16px 0; line-height: 1.6;">
+        Paste your payload into QuietJSON's free online tools — 100% private and runs locally in your browser.
+      </p>
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <a
+          href="/"
+          style="padding: 8px 18px; font-size: 13px; font-weight: 500; background: var(--color-ink); color: var(--color-canvas); border-radius: var(--radius-sm); text-decoration: none;"
+        >
+          JSON Formatter &amp; Validator
+        </a>
+        <a
+          href="/json-repair/"
+          style="padding: 8px 18px; font-size: 13px; font-weight: 500; background: var(--color-canvas-soft-2); color: var(--color-body); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); text-decoration: none;"
+        >
+          Auto-Repair Broken JSON
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <style>{`
+    .error-card:hover {
+      border-color: var(--color-hairline-strong) !important;
+      box-shadow: var(--shadow-1);
+    }
+  `}</style>
+</Layout>

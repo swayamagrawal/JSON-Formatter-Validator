@@ -1,0 +1,169 @@
+---
+// src/pages/errors/trailing-comma.astro
+import Layout from "../../layouts/Layout.astro";
+
+const pageTitle = "Fix: Trailing Comma in JSON (Objects & Arrays) | QuietJSON";
+const pageDesc = "Why trailing commas in JSON trigger 'SyntaxError: Unexpected token } or ]'. Learn why JSON forbids trailing commas and how to strip them automatically.";
+const canonical = "https://quietjson.com/errors/trailing-comma/";
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quietjson.com" },
+    { "@type": "ListItem", "position": 2, "name": "Error Reference", "item": "https://quietjson.com/errors/" },
+    { "@type": "ListItem", "position": 3, "name": "Trailing Comma in JSON", "item": canonical }
+  ]
+};
+
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Why does JSON forbid trailing commas when JavaScript allows them?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Douglas Crockford designed JSON in 2001 as a strict, universal data interchange subset of ECMAScript 3. In ES3 (and old browsers like Internet Explorer 6/7), trailing commas caused runtime syntax errors or created extra undefined array elements. To ensure compatibility across every programming language, RFC 8259 explicitly specifies that commas must separate items and cannot follow the last item."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I fix trailing comma errors automatically?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Paste your JSON into the QuietJSON Repair tool (quietjson.com/json-repair/). It safely removes all trailing commas before closing braces and brackets in one click."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does JSON5 or JSONC allow trailing commas?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Extensions like JSON5 and JSONC (used in VS Code configuration files) explicitly permit trailing commas and comments. However, standard API endpoints and native JSON.parse() require strict RFC 8259 compliance."
+      }
+    }
+  ]
+};
+---
+
+<Layout title={pageTitle} description={pageDesc} canonical={canonical}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+
+  <div style="max-width: 780px; width: 100%; margin: 0 auto; padding: 24px 16px 64px; box-sizing: border-box;">
+    <!-- Breadcrumb -->
+    <nav style="font-size: 13px; color: var(--color-mute); margin-bottom: 20px;">
+      <a href="/" style="color: var(--color-link); text-decoration: none;">Home</a>
+      <span style="margin: 0 6px;">&#8250;</span>
+      <a href="/errors/" style="color: var(--color-link); text-decoration: none;">Errors</a>
+      <span style="margin: 0 6px;">&#8250;</span>
+      <span style="color: var(--color-ink);">Trailing Comma</span>
+    </nav>
+
+    <!-- Header -->
+    <div style="margin-bottom: 28px;">
+      <div style="font-size: 12px; font-weight: 600; color: var(--color-error-deep); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+        SyntaxError: Unexpected Token
+      </div>
+      <h1 style="font-size: clamp(22px, 5vw, 30px); font-weight: 700; letter-spacing: -0.5px; color: var(--color-ink); margin: 0 0 10px 0; line-height: 1.25;">
+        Fix: Trailing Comma in JSON
+      </h1>
+      <p style="font-size: 15px; color: var(--color-body); line-height: 1.6; margin: 0;">
+        You added a comma after the final property in an object or array, and <code style="font-family: var(--font-mono); font-size: 13px; background: var(--color-canvas-soft-2); padding: 1px 5px; border-radius: 4px;">JSON.parse()</code> crashed with a SyntaxError pointing to <code style="font-family: var(--font-mono);">&#125;</code> or <code style="font-family: var(--font-mono);">]</code>.
+      </p>
+    </div>
+
+    <!-- Error Display Box -->
+    <div style="background: var(--color-error-soft); border: 1px solid var(--color-error-hairline); border-radius: var(--radius-md); padding: 16px; margin-bottom: 32px; font-family: var(--font-mono); font-size: 13px; color: var(--color-error-deep); line-height: 1.5;">
+      <strong>SyntaxError:</strong> Unexpected token '&#125;', "..."name": "Alice",&#125;" is not valid JSON
+      <br /><span style="font-size: 11.5px; color: var(--color-mute);">(or: Expected double-quoted property name)</span>
+    </div>
+
+    <!-- Why JSON forbids trailing commas -->
+    <section style="margin-bottom: 36px;">
+      <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+        Why Does JSON Forbid Trailing Commas?
+      </h2>
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0 0 12px 0;">
+        In modern JavaScript, TypeScript, Python, and Rust, trailing commas are recommended best practice because they make git diffs cleaner when adding new properties.
+      </p>
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0;">
+        However, JSON is not JavaScript. In RFC 8259 Section 4, an object is strictly defined as zero or more name/value pairs separated by commas. A comma tells the parser: <em>"Expect another property immediately after this."</em> When the parser finds a closing bracket (<code style="font-family: var(--font-mono);">]</code>) or closing brace (<code style="font-family: var(--font-mono);">&#125;</code>) instead, it fails with a SyntaxError.
+      </p>
+    </section>
+
+    <!-- Visual Examples -->
+    <section style="margin-bottom: 36px;">
+      <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+        Examples: Broken vs. Fixed
+      </h2>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <div style="background: var(--color-error-soft); border: 1px solid var(--color-error-hairline); border-radius: var(--radius-sm); padding: 14px; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.5;">
+          <div style="font-weight: 600; color: var(--color-error-deep); margin-bottom: 6px;">Invalid (Trailing Commas):</div>
+          &#123;<br />
+          &nbsp;&nbsp;"id": 1,<br />
+          &nbsp;&nbsp;"tags": ["dev", "ui"<span style="color: var(--color-error-deep); font-weight: bold;">,</span>],<br />
+          &nbsp;&nbsp;"active": true<span style="color: var(--color-error-deep); font-weight: bold;">,</span><br />
+          &#125;
+        </div>
+
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-sm); padding: 14px; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.5;">
+          <div style="font-weight: 600; color: #15803d; margin-bottom: 6px;">Valid JSON (RFC 8259):</div>
+          &#123;<br />
+          &nbsp;&nbsp;"id": 1,<br />
+          &nbsp;&nbsp;"tags": ["dev", "ui"],<br />
+          &nbsp;&nbsp;"active": true<br />
+          &#125;
+        </div>
+      </div>
+    </section>
+
+    <!-- LLMs and Trailing Commas -->
+    <section style="margin-bottom: 36px;">
+      <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+        Why LLMs (ChatGPT, Claude) Output Trailing Commas
+      </h2>
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0;">
+        Large language models generate tokens sequentially. When finishing an object item, the model's training on millions of JavaScript and Python code files strongly predicts a trailing comma before outputting the closing brace. If you are building AI agents or processing LLM outputs, you should always run an auto-repair step to sanitize trailing commas.
+      </p>
+    </section>
+
+    <!-- FAQ -->
+    <section style="margin-bottom: 40px;">
+      <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 16px 0;">
+        Frequently Asked Questions
+      </h2>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        {faqLd.mainEntity.map((item) => (
+          <div style="border-bottom: 1px solid var(--color-hairline); padding-bottom: 16px;">
+            <h3 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 6px 0;">
+              {item.name}
+            </h3>
+            <p style="font-size: 14px; color: var(--color-body); line-height: 1.7; margin: 0;">
+              {item.acceptedAnswer.text}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- QuietJSON CTA -->
+    <div style="padding: 20px; background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h4 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 4px 0;">
+          Auto-remove trailing commas instantly
+        </h4>
+        <p style="font-size: 13px; color: var(--color-body); margin: 0;">
+          QuietJSON Repair cleans up trailing commas in objects and arrays with a single click.
+        </p>
+      </div>
+      <a href="/json-repair/" style="padding: 7px 16px; font-size: 13px; font-weight: 500; background: var(--color-ink); color: var(--color-canvas); border-radius: var(--radius-sm); text-decoration: none;">
+        Fix Trailing Commas &#8594;
+      </a>
+    </div>
+
+  </div>
+</Layout>

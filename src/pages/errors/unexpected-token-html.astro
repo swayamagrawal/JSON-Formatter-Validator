@@ -1,0 +1,194 @@
+---
+// src/pages/errors/unexpected-token-html.astro
+import Layout from "../../layouts/Layout.astro";
+
+const pageTitle = "Fix: Unexpected token < in JSON at position 0 | QuietJSON";
+const pageDesc = "How to fix 'SyntaxError: Unexpected token < in JSON at position 0'. Learn why your fetch call or API returned an HTML error page instead of JSON.";
+const canonical = "https://quietjson.com/errors/unexpected-token-html/";
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quietjson.com" },
+    { "@type": "ListItem", "position": 2, "name": "Error Reference", "item": "https://quietjson.com/errors/" },
+    { "@type": "ListItem", "position": 3, "name": "Unexpected token < in JSON", "item": canonical }
+  ]
+};
+
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What causes 'Unexpected token < in JSON at position 0'?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "This error occurs when JavaScript calls JSON.parse() or response.json() on a response that starts with an opening angle bracket (<). This almost always means the web server returned an HTML webpage (such as a 404 Not Found page, 500 Server Error, or a login/redirect page) instead of a JSON payload."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I safely inspect an API response before parsing JSON?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Check response.ok and response.headers.get('content-type') before calling response.json(). If the content-type is 'text/html', inspect response.text() to read the error message returned by the server."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why does QuietJSON flag HTML error pages?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "When developers paste API responses into JSON tools, generic parsers just say 'Unexpected token <'. QuietJSON immediately identifies <!DOCTYPE html> or HTML tags and warns you that your API returned an HTML error document."
+      }
+    }
+  ]
+};
+---
+
+<Layout title={pageTitle} description={pageDesc} canonical={canonical}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+
+  <div style="max-width: 780px; width: 100%; margin: 0 auto; padding: 24px 16px 64px; box-sizing: border-box;">
+    <!-- Breadcrumb -->
+    <nav style="font-size: 13px; color: var(--color-mute); margin-bottom: 20px;">
+      <a href="/" style="color: var(--color-link); text-decoration: none;">Home</a>
+      <span style="margin: 0 6px;">&#8250;</span>
+      <a href="/errors/" style="color: var(--color-link); text-decoration: none;">Errors</a>
+      <span style="margin: 0 6px;">&#8250;</span>
+      <span style="color: var(--color-ink);">Unexpected token &lt;</span>
+    </nav>
+
+    <!-- Header -->
+    <div style="margin-bottom: 28px;">
+      <div style="font-size: 12px; font-weight: 600; color: var(--color-error-deep); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+        API &amp; Parsing Error
+      </div>
+      <h1 style="font-size: clamp(22px, 5vw, 30px); font-weight: 700; letter-spacing: -0.5px; color: var(--color-ink); margin: 0 0 10px 0; line-height: 1.25;">
+        Fix: Unexpected token &lt; in JSON at position 0
+      </h1>
+      <p style="font-size: 15px; color: var(--color-body); line-height: 1.6; margin: 0;">
+        You called <code style="font-family: var(--font-mono); font-size: 13px; background: var(--color-canvas-soft-2); padding: 1px 5px; border-radius: 4px;">response.json()</code> or <code style="font-family: var(--font-mono); font-size: 13px; background: var(--color-canvas-soft-2); padding: 1px 5px; border-radius: 4px;">JSON.parse()</code>, and your application crashed with a SyntaxError pointing to position 0. Here is why it happened and how to fix it.
+      </p>
+    </div>
+
+    <!-- Error Display Box -->
+    <div style="background: var(--color-error-soft); border: 1px solid var(--color-error-hairline); border-radius: var(--radius-md); padding: 16px; margin-bottom: 32px; font-family: var(--font-mono); font-size: 13px; color: var(--color-error-deep); line-height: 1.5;">
+      <strong>SyntaxError:</strong> Unexpected token '&lt;', "&lt;!DOCTYPE "... is not valid JSON
+      <br /><span style="font-size: 11.5px; color: var(--color-mute);">(Chrome, Node.js, Safari, Firefox)</span>
+    </div>
+
+    <!-- What it means -->
+    <section style="margin-bottom: 36px;">
+      <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+        What Does This Error Mean?
+      </h2>
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0 0 12px 0;">
+        Valid JSON must begin with an opening curly brace (<code style="font-family: var(--font-mono);">&#123;</code>), an opening square bracket (<code style="font-family: var(--font-mono);">[</code>), a double-quoted string, a number, a boolean, or <code style="font-family: var(--font-mono);">null</code>.
+      </p>
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0;">
+        An opening angle bracket (<code style="font-family: var(--font-mono);">&lt;</code>) at position 0 is the universal marker of an <strong>HTML document</strong> (like <code style="font-family: var(--font-mono);">&lt;!DOCTYPE html&gt;</code> or <code style="font-family: var(--font-mono);">&lt;html&gt;</code>). You thought your API returned JSON, but the server actually returned an HTML page.
+      </p>
+    </section>
+
+    <!-- Why it happens -->
+    <section style="margin-bottom: 36px;">
+      <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+        The 4 Most Common Causes
+      </h2>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="padding: 14px; background: var(--color-canvas); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm);">
+          <strong style="font-size: 14px; color: var(--color-ink);">1. Incorrect API URL (404 Not Found)</strong>
+          <p style="font-size: 13.5px; color: var(--color-body); line-height: 1.6; margin: 4px 0 0 0;">
+            A typo in the endpoint path or a missing <code style="font-family: var(--font-mono);">/api/</code> prefix caused your web server (Nginx, Apache, Next.js, Cloudflare) to serve your website's 404 HTML fallback page.
+          </p>
+        </div>
+
+        <div style="padding: 14px; background: var(--color-canvas); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm);">
+          <strong style="font-size: 14px; color: var(--color-ink);">2. Server Crash or 500 Internal Server Error</strong>
+          <p style="font-size: 13.5px; color: var(--color-body); line-height: 1.6; margin: 4px 0 0 0;">
+            An unhandled exception crashed your backend application. Instead of returning an application error JSON payload, the reverse proxy rendered a generic server error HTML page.
+          </p>
+        </div>
+
+        <div style="padding: 14px; background: var(--color-canvas); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm);">
+          <strong style="font-size: 14px; color: var(--color-ink);">3. Authentication Redirects (302 Found)</strong>
+          <p style="font-size: 13.5px; color: var(--color-body); line-height: 1.6; margin: 4px 0 0 0;">
+            An expired session cookie or missing Authorization Bearer token caused an auth gateway to redirect your request to an HTML login page.
+          </p>
+        </div>
+
+        <div style="padding: 14px; background: var(--color-canvas); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm);">
+          <strong style="font-size: 14px; color: var(--color-ink);">4. Single Page App (SPA) Fallback</strong>
+          <p style="font-size: 13.5px; color: var(--color-body); line-height: 1.6; margin: 4px 0 0 0;">
+            In React/Vue/Vite projects, requesting an invalid route often serves <code style="font-family: var(--font-mono);">index.html</code> so client-side routing can take over. When your fetch calls a non-existent API route, it gets your app's main HTML.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Code Examples -->
+    <section style="margin-bottom: 36px;">
+      <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+        How to Defend Your Code
+      </h2>
+      <p style="font-size: 14px; color: var(--color-body); line-height: 1.7; margin: 0 0 12px 0;">
+        Never call <code style="font-family: var(--font-mono);">response.json()</code> blindly without verifying the HTTP status and content type header:
+      </p>
+
+      <div style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 16px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.6;">
+        <span style="color: var(--color-mute);">// Bad: Crashes with SyntaxError if status is 404 or 500</span><br />
+        <span style="color: var(--color-error-deep);">const data = await fetch('/api/user').then(r =&gt; r.json());</span><br /><br />
+        <span style="color: var(--color-mute);">// Good: Defensively verify status &amp; content type</span><br />
+        <span style="color: var(--color-ink);">const res = await fetch('/api/user');</span><br />
+        <span style="color: var(--color-ink);">const contentType = res.headers.get('content-type') || '';</span><br /><br />
+        <span style="color: var(--color-ink);">if (!res.ok) &#123;</span><br />
+        <span style="color: var(--color-ink);">&nbsp;&nbsp;const errorText = await res.text();</span><br />
+        <span style="color: var(--color-ink);">&nbsp;&nbsp;throw new Error(`HTTP $&#123;res.status&#125;: $&#123;errorText.slice(0, 100)&#125;`);</span><br />
+        <span style="color: var(--color-ink);">&#125;</span><br /><br />
+        <span style="color: var(--color-ink);">if (!contentType.includes('application/json')) &#123;</span><br />
+        <span style="color: var(--color-ink);">&nbsp;&nbsp;throw new Error(`Expected JSON but received $&#123;contentType&#125;`);</span><br />
+        <span style="color: var(--color-ink);">&#125;</span><br /><br />
+        <span style="color: var(--color-ink);">const data = await res.json();</span>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section style="margin-bottom: 40px;">
+      <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 16px 0;">
+        Frequently Asked Questions
+      </h2>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        {faqLd.mainEntity.map((item) => (
+          <div style="border-bottom: 1px solid var(--color-hairline); padding-bottom: 16px;">
+            <h3 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 6px 0;">
+              {item.name}
+            </h3>
+            <p style="font-size: 14px; color: var(--color-body); line-height: 1.7; margin: 0;">
+              {item.acceptedAnswer.text}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- QuietJSON CTA -->
+    <div style="padding: 20px; background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h4 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 4px 0;">
+          Inspect payloads with QuietJSON Formatter
+        </h4>
+        <p style="font-size: 13px; color: var(--color-body); margin: 0;">
+          Get immediate diagnostics when API responses contain unexpected HTML or broken tokens.
+        </p>
+      </div>
+      <a href="/" style="padding: 7px 16px; font-size: 13px; font-weight: 500; background: var(--color-ink); color: var(--color-canvas); border-radius: var(--radius-sm); text-decoration: none;">
+        Open Formatter &#8594;
+      </a>
+    </div>
+
+  </div>
+</Layout>

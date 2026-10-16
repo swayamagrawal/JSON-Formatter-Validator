@@ -1,4 +1,4 @@
-﻿# QuietJSON
+# QuietJSON
 
 > QuietJSON is a free, 100% client-side JSON toolkit for developers. It formats, validates, minifies, auto-repairs, converts, and diffs JSON data entirely inside the browser — no data is ever uploaded to a server. Built for developers who work with REST APIs, LLM outputs, and data pipelines where privacy matters.
 
@@ -112,6 +112,44 @@ Common use cases:
 - Reviewing LLM output changes between prompts
 
 Privacy: Both JSON inputs are processed entirely in the browser.
+
+### CSV to JSON Converter
+https://quietjson.com/csv-to-json/
+
+QuietJSON's CSV to JSON converter transforms RFC 4180 compliant CSV tables into structured JSON arrays of objects.
+
+Features:
+- Full RFC 4180 parsing: handles quoted fields with embedded commas, newlines, and escaped quotes ("")
+- Automatic type detection: converts numeric and boolean values into native JSON primitives
+- Safe integer protection: preserves integers exceeding 2^53-1 as strings to avoid precision loss
+- Automatic duplicate header disambiguation to prevent silent column overwriting
+- 100% client-side execution — zero network calls
+
+---
+
+### JSON to TypeScript Converter
+https://quietjson.com/json-to-typescript/
+
+QuietJSON's JSON to TypeScript converter generates strongly typed TypeScript interfaces and type definitions from JSON payloads.
+
+Features:
+- Recursive structure analysis with cleanly indented nested types
+- Array union inference: automatically marks optional fields (?) across objects in arrays
+- Identifier sanitization: quotes invalid JS identifier property names and keywords
+- Customizable root interface name and export keyword toggle
+- 100% client-side execution
+
+---
+
+### Error Reference & Solutions Hub
+https://quietjson.com/errors/
+
+Technical diagnosis and resolution guides for the most common JSON syntax and semantic errors:
+- Unexpected token < in JSON at position 0 (HTML error page response)
+- Python Literals (True, False, None) in JSON
+- Duplicate Keys in JSON Objects (RFC 8259 parser inconsistencies)
+- Windows Path Backslash Escaping (\t, \n corruption)
+- Trailing Commas in Objects and Arrays
 
 ---
 

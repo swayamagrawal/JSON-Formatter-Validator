@@ -6,18 +6,29 @@ QuietJSON processes all JSON operations using local JavaScript execution in the 
 
 ## Tools
 
-- [JSON Formatter & Validator](https://quietjson.com/): Format, validate, and beautify JSON with 2-space, 4-space, or tab indentation. Real-time syntax validation with error line numbers. Includes interactive Tree View.
-- [JSON Repair Tool](https://quietjson.com/json-repair): Auto-fix broken JSON from ChatGPT, Claude, Gemini, and Python. Repairs trailing commas, single quotes, unquoted keys, Python True/False/None, and missing brackets.
-- [JSON to CSV Converter](https://quietjson.com/json-to-csv): Convert JSON arrays of objects to CSV with dot-notation key flattening for nested objects. Download as .csv file instantly.
-- [JSON to YAML Converter](https://quietjson.com/json-to-yaml): Convert JSON to YAML and YAML to JSON. Bi-directional conversion with clean YAML formatting.
-- [JSON Diff Tool](https://quietjson.com/json-diff): Compare two JSON objects side-by-side. Highlights added, removed, and modified values with full JSONPath references.
+- [JSON Formatter & Validator](https://quietjson.com/): Format, validate, sort keys, and beautify JSON with 2-space, 4-space, or tab indentation. Real-time syntax validation with error line numbers and rich document metrics. Includes interactive Tree View.
+- [JSON Repair Tool](https://quietjson.com/json-repair/): Auto-fix broken JSON from ChatGPT, Claude, Gemini, and Python. Repairs trailing commas, single quotes, unquoted keys, Python True/False/None, and missing brackets.
+- [JSON to CSV Converter](https://quietjson.com/json-to-csv/): Convert JSON arrays of objects or single objects to CSV with dot-notation key flattening for nested objects. Download as .csv file instantly.
+- [CSV to JSON Converter](https://quietjson.com/csv-to-json/): Convert RFC 4180 CSV tables into structured JSON arrays of objects with auto-type inference and safe integer protection.
+- [JSON to YAML Converter](https://quietjson.com/json-to-yaml/): Convert JSON to YAML and YAML to JSON. Bi-directional conversion with clean YAML formatting.
+- [JSON to TypeScript Converter](https://quietjson.com/json-to-typescript/): Generate TypeScript interfaces and type definitions from JSON payloads with optional field detection.
+- [JSON Diff Tool](https://quietjson.com/json-diff/): Compare two JSON objects side-by-side. Highlights added, removed, and modified values with full JSONPath references.
+
+## Error Reference & Solutions
+
+- [JSON Error Reference Hub](https://quietjson.com/errors/): Technical diagnostics and resolutions for common JSON syntax errors.
+- [Unexpected token < in JSON](https://quietjson.com/errors/unexpected-token-html/): Diagnosis and fixes when API endpoints return HTML error pages.
+- [Python Literals in JSON](https://quietjson.com/errors/python-literals/): Fixing True, False, and None in JSON payloads.
+- [Duplicate Keys in JSON](https://quietjson.com/errors/duplicate-keys/): Explaining parser inconsistencies and RFC 8259 unique key requirements.
+- [Windows Path Backslash Escapes](https://quietjson.com/errors/windows-path-escape/): Preventing silent corruption of single-backslash file paths.
+- [Trailing Comma in JSON](https://quietjson.com/errors/trailing-comma/): RFC 8259 comma requirements and auto-removal techniques.
 
 ## Guides
 
-- [Developer Guides & Tutorials](https://quietjson.com/guides): Hub of technical articles on JSON formatting, comparison, and LLM syntax repair.
-- [How to Compare Two JSON Files](https://quietjson.com/guides/how-to-compare-two-json-files): Comprehensive guide explaining why text diff fails on JSON and how semantic comparison works.
-- [How to Fix JSON from ChatGPT, Claude & Gemini](https://quietjson.com/guides/how-to-fix-json-from-chatgpt): Fix common LLM JSON syntax errors like unquoted keys and Python booleans.
-- [JSON Formatting Guide](https://quietjson.com/guides/json-formatter-guide): How to format, validate, and beautify JSON online.
+- [Developer Guides & Tutorials](https://quietjson.com/guides/): Hub of technical articles on JSON formatting, comparison, and LLM syntax repair.
+- [How to Compare Two JSON Files](https://quietjson.com/guides/how-to-compare-two-json-files/): Comprehensive guide explaining why text diff fails on JSON and how semantic comparison works.
+- [How to Fix JSON from ChatGPT, Claude & Gemini](https://quietjson.com/guides/how-to-fix-json-from-chatgpt/): Fix common LLM JSON syntax errors like unquoted keys and Python booleans.
+- [JSON Formatting Guide](https://quietjson.com/guides/json-formatter-guide/): How to format, validate, and beautify JSON online.
 
 ## About
 

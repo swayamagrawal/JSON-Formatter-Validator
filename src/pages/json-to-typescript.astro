@@ -1,0 +1,152 @@
+---
+// src/pages/json-to-typescript.astro
+import Layout from "../layouts/Layout.astro";
+import JsonToTypeScript from "../components/islands/JsonToTypeScript";
+
+const faqItems = [
+  {
+    question: "How does QuietJSON handle nested JSON objects when generating TypeScript?",
+    answer: "QuietJSON recursively inspects nested JSON structures and outputs cleanly indented nested object types or interfaces, preserving exact property hierarchies without name collision risks."
+  },
+  {
+    question: "What happens when an array of objects has missing or optional fields?",
+    answer: "QuietJSON inspects all objects in an array, computes the union of all keys, and automatically appends the TypeScript optional modifier (?) to any properties that are present in some objects but missing in others."
+  },
+  {
+    question: "How are non-standard property names like hyphens or numbers handled?",
+    answer: "Keys that contain hyphens, spaces, leading digits, or reserved JavaScript keywords (such as 'first-name', '123', or 'default') are automatically enclosed in quotes so the generated TypeScript code compiles cleanly without syntax errors."
+  },
+  {
+    question: "Is my JSON payload uploaded to a server for TypeScript generation?",
+    answer: "No. QuietJSON runs entirely client-side in your browser using pure JavaScript. Your JSON data never leaves your device, making it safe for proprietary schemas, auth payloads, and sensitive customer data."
+  }
+];
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqItems.map((f) => ({
+    "@type": "Question",
+    "name": f.question,
+    "acceptedAnswer": { "@type": "Answer", "text": f.answer },
+  })),
+};
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quietjson.com" },
+    { "@type": "ListItem", "position": 2, "name": "JSON to TypeScript Converter", "item": "https://quietjson.com/json-to-typescript/" }
+  ]
+};
+---
+
+<Layout
+  title="JSON to TypeScript Converter — Free Online Tool | QuietJSON"
+  description="Generate TypeScript interfaces and types from JSON objects or arrays instantly. Handles nested objects, optional fields, and special identifiers 100% client-side."
+  canonical="https://quietjson.com/json-to-typescript/"
+>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-8">
+    <!-- Heading -->
+    <div style="margin-bottom: 16px;">
+      <h1 style="font-size: clamp(20px, 4.5vw, 24px); font-weight: 600; letter-spacing: -0.4px; color: var(--color-ink); margin: 0 0 6px 0; line-height: 1.3; word-break: break-word;">
+        JSON to TypeScript Converter
+      </h1>
+      <p style="font-size: 14px; color: var(--color-body); margin: 0; line-height: 1.5;">
+        Generate strongly typed TypeScript interfaces and types from JSON payloads — with optional field detection and zero network requests.
+      </p>
+    </div>
+
+    <!-- Island -->
+    <div class="island-shell">
+      <div class="island-skeleton" aria-hidden="true">
+        <div class="skel-toolbar"></div>
+        <div class="skel-body"></div>
+      </div>
+      <JsonToTypeScript client:only="preact" />
+    </div>
+  </div>
+
+  <!-- SEO content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
+    <div style="max-width: 760px;">
+
+      <section style="margin-bottom: 48px;">
+        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Why Convert JSON to TypeScript?
+        </h2>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0 0 12px 0;">
+          Working with untyped REST APIs, webhook payloads, and configuration files in TypeScript often leads to
+          tedious manual interface writing. QuietJSON inspects your sample JSON payloads and automatically derives
+          strict, compile-ready TypeScript interfaces.
+        </p>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0;">
+          Our converter analyzes primitive arrays (<code style="font-family: var(--font-mono); font-size: 13px; background: var(--color-canvas-soft-2); padding: 1px 5px; border-radius: 4px;">string[]</code>, <code style="font-family: var(--font-mono); font-size: 13px; background: var(--color-canvas-soft-2); padding: 1px 5px; border-radius: 4px;">number[]</code>),
+          infers optional properties when items in an array have varying schemas (<code style="font-family: var(--font-mono); font-size: 13px; background: var(--color-canvas-soft-2); padding: 1px 5px; border-radius: 4px;">optionalProp?: string</code>),
+          and safely quotes non-standard identifiers.
+        </p>
+      </section>
+
+      <section style="margin-bottom: 48px;">
+        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          How to Use
+        </h2>
+        <ol style="font-size: 14px; color: var(--color-body); line-height: 1.9; margin: 0; padding-left: 20px;">
+          <li>Paste your raw JSON object or array into the left editor (or click <strong>Sample JSON</strong> to test).</li>
+          <li>Optionally set the root interface name (default: <code style="font-family: var(--font-mono); font-size: 13px; background: var(--color-canvas-soft-2); padding: 1px 5px; border-radius: 4px;">RootObject</code>) and toggle the <code style="font-family: var(--font-mono); font-size: 13px; background: var(--color-canvas-soft-2); padding: 1px 5px; border-radius: 4px;">export</code> keyword.</li>
+          <li>Click <strong>Generate TypeScript</strong>.</li>
+          <li>Click <strong>Copy</strong> to copy the types into your code editor, or <strong>↓ Download .ts</strong> to save a TypeScript definitions file.</li>
+        </ol>
+      </section>
+
+      <section style="margin-bottom: 48px;">
+        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Frequently Asked Questions
+        </h2>
+        <div style="display: flex; flexDirection: column; gap: 20px;">
+          {faqItems.map((item) => (
+            <div style="border-bottom: 1px solid var(--color-hairline); padding-bottom: 18px;">
+              <h3 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 8px 0;">
+                {item.question}
+              </h3>
+              <p style="font-size: 14px; color: var(--color-body); line-height: 1.7; margin: 0;">
+                {item.answer}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style="padding: 20px 24px; background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md);">
+        <h2 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 8px 0;">
+          Explore More Developer Tools
+        </h2>
+        <p style="font-size: 13px; color: var(--color-body); margin: 0 0 12px 0; line-height: 1.6;">
+          Check out our complete suite of developer utilities, all 100% private with zero telemetry:
+        </p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <a href="/csv-to-json/" style="font-size: 13px; color: var(--color-link); text-decoration: none; font-weight: 500;">
+            CSV to JSON →
+          </a>
+          <a href="/json-to-csv/" style="font-size: 13px; color: var(--color-link); text-decoration: none; font-weight: 500;">
+            JSON to CSV →
+          </a>
+          <a href="/json-to-yaml/" style="font-size: 13px; color: var(--color-link); text-decoration: none; font-weight: 500;">
+            JSON to YAML →
+          </a>
+          <a href="/json-diff/" style="font-size: 13px; color: var(--color-link); text-decoration: none; font-weight: 500;">
+            JSON Diff →
+          </a>
+          <a href="/json-repair/" style="font-size: 13px; color: var(--color-link); text-decoration: none; font-weight: 500;">
+            JSON Repair →
+          </a>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</Layout>
