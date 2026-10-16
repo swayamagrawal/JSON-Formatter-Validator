@@ -41,7 +41,7 @@ const breadcrumbLd = {
 
 <Layout
   title="JSON to CSV Converter — Free Online Tool | QuietJSON"
-  description="Convert JSON array of objects to CSV instantly. Nested objects flattened with dot notation. 100% client-side, no data leaves your browser."
+  description="Convert JSON array of objects or single JSON object to CSV instantly. Nested objects flattened with dot notation. 100% client-side, no data leaves your browser."
   canonical="https://quietjson.com/json-to-csv/"
 >
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
@@ -54,7 +54,7 @@ const breadcrumbLd = {
         JSON to CSV Converter
       </h1>
       <p style="font-size: 14px; color: var(--color-body); margin: 0; line-height: 1.5;">
-        Convert a JSON array of objects to CSV — nested keys auto-flattened with dot notation.
+        Convert a JSON array of objects or single JSON object to CSV — nested keys auto-flattened with dot notation.
       </p>
     </div>
 
@@ -79,7 +79,7 @@ const breadcrumbLd = {
         <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0 0 12px 0;">
           JSON is the universal data format for APIs and web services, but CSV (Comma Separated Values) is
           the language of spreadsheets, Excel, Google Sheets, and database imports. This converter bridges
-          that gap — paste your JSON array and get a clean, properly escaped CSV in one click.
+          that gap — paste your JSON array or single object and get a clean, properly escaped CSV in one click.
         </p>
         <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0;">
           Nested objects like <code style="font-family: var(--font-mono); font-size: 13px; background: var(--color-canvas-soft-2); padding: 1px 5px; border-radius: 4px;">&#34;address&#34;: &#123;&#34;city&#34;: &#34;Mumbai&#34;&#125;</code> are automatically
@@ -93,7 +93,7 @@ const breadcrumbLd = {
           How to Use
         </h2>
         <ol style="font-size: 14px; color: var(--color-body); line-height: 1.9; margin: 0; padding-left: 20px;">
-          <li>Paste your JSON array of objects into the left panel (or upload a .json file).</li>
+          <li>Paste your JSON array of objects or single JSON object into the left panel (or upload a .json file).</li>
           <li>Click <strong>Convert to CSV</strong>.</li>
           <li>Review the CSV output on the right — it shows the row count automatically.</li>
           <li>Click <strong>Copy</strong> to paste into Excel/Sheets, or <strong>↓ Download</strong> to save as a .csv file.</li>

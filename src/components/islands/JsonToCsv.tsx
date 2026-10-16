@@ -188,7 +188,7 @@ export default function JsonToCsv() {
           background: "var(--color-canvas)",
           boxShadow: "var(--shadow-1)",
         }}>
-          <PanelHeader label="Input" hint="Paste JSON array of objects" />
+          <PanelHeader label="Input" hint="Paste JSON array or single object" />
           <textarea
             value={input}
             onInput={(e) => {
@@ -363,7 +363,7 @@ export default function JsonToCsv() {
         display: "flex",
         gap: "16px",
       }}>
-        {!input.trim() && <span>○ Paste a JSON array of objects to begin</span>}
+        {!input.trim() && <span>○ Paste a JSON array or single object to begin</span>}
         {input.trim() && error && <span style={{ color: "var(--color-error, #ee0000)" }}>✗ {error}</span>}
         {input.trim() && output && (
           <>

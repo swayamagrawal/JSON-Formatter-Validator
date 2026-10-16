@@ -2,6 +2,7 @@
 // JSON repair logic using the jsonrepair package — 100% client-side
 
 import { jsonrepair } from "jsonrepair";
+import { isHtmlResponse } from "./formatters";
 
 export type RepairResult =
   | { success: true; output: string; alreadyValid: boolean; changes: string[] }
@@ -14,6 +15,14 @@ export type RepairResult =
 export function repairJSON(input: string): RepairResult {
   const trimmed = input.trim();
   if (!trimmed) return { success: true, output: "", alreadyValid: true, changes: [] };
+
+  if (isHtmlResponse(trimmed)) {
+    return {
+      success: false,
+      error:
+        "Input appears to be an HTML document or error page, not JSON. HTML cannot be repaired into JSON; check if your API returned an error page (e.g. 404 or 500) or an incorrect URL.",
+    };
+  }
 
   // Check if already valid
   try {

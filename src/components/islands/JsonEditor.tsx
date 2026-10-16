@@ -28,10 +28,20 @@ import {
 } from "@codemirror/language";
 import { tags as t } from "@lezer/highlight";
 import { linter, lintGutter, type Diagnostic } from "@codemirror/lint";
-import { parse, printParseErrorCode } from "jsonc-parser";
+import { parse } from "jsonc-parser";
 import type { ParseError } from "jsonc-parser";
 
-import { formatJSON, minifyJSON, getStats, formatBytes } from "../../lib/formatters";
+import {
+  formatJSON,
+  minifyJSON,
+  getStats,
+  formatBytes,
+  findDuplicateKeys,
+  findUnsafeIntegers,
+  findWindowsPathEscapes,
+  validateJSON,
+  formatJsonErrorMessage,
+} from "../../lib/formatters";
 import { repairJSON } from "../../lib/repair";
 import TreeView from "./TreeView";
 
@@ -43,6 +53,7 @@ type StatusState =
   | { type: "idle" }
   | { type: "empty" }
   | { type: "valid" }
+  | { type: "warning"; message: string; line: number; column: number; key?: string; value?: string; warningType?: "duplicate-key" | "unsafe-integer" | "escape-path" }
   | { type: "error"; message: string; line: number; column: number }
   | { type: "repaired"; changes: string[] };
 
@@ -55,8 +66,8 @@ type Toast =
 // ─── JSON Linter for CodeMirror ───────────────────────────────────────────────
 
 /**
- * Build a CodeMirror linter that surfaces all JSON errors as inline diagnostics.
- * Uses jsonc-parser which reports ALL errors, not just the first one.
+ * Build a CodeMirror linter that surfaces all JSON errors as inline diagnostics,
+ * along with non-fatal warnings (such as duplicate object keys).
  * delay: 300ms debounce so it doesn't fire on every keystroke.
  */
 function buildJsonLinter() {
@@ -68,12 +79,47 @@ function buildJsonLinter() {
       const errors: ParseError[] = [];
       parse(text, errors, { allowTrailingComma: false, disallowComments: true });
 
-      return errors.map((err) => ({
+      const diagnostics: Diagnostic[] = errors.map((err) => ({
         from: err.offset,
         to: err.offset + Math.max(err.length, 1),
         severity: "error" as const,
-        message: printParseErrorCode(err.error),
+        message: formatJsonErrorMessage(text, err),
       }));
+
+      // Surface duplicate key warnings with yellow squiggly and location
+      const dupWarnings = findDuplicateKeys(text);
+      for (const w of dupWarnings) {
+        diagnostics.push({
+          from: w.offset,
+          to: w.offset + Math.max((w.key ?? "").length + 2, 1),
+          severity: "warning" as const,
+          message: w.message,
+        });
+      }
+
+      // Surface unsafe integer precision warnings with yellow squiggly and location
+      const precisionWarnings = findUnsafeIntegers(text);
+      for (const w of precisionWarnings) {
+        diagnostics.push({
+          from: w.offset,
+          to: w.offset + Math.max((w.value ?? "").length, 1),
+          severity: "warning" as const,
+          message: w.message,
+        });
+      }
+
+      // Surface Windows path escape warnings with yellow squiggly and location
+      const pathWarnings = findWindowsPathEscapes(text);
+      for (const w of pathWarnings) {
+        diagnostics.push({
+          from: w.offset,
+          to: w.offset + Math.max((w.value ?? "").length, 1),
+          severity: "warning" as const,
+          message: w.message,
+        });
+      }
+
+      return diagnostics;
     },
     { delay: 300 }
   );
@@ -388,21 +434,31 @@ export default function JsonEditor({ initialInput, inputPlaceholder }: JsonEdito
       setFormatError(null);
       return;
     }
-    try {
-      JSON.parse(val);
-      setStatus({ type: "valid" });
-      setFormatError(null);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Invalid JSON";
-      const match = msg.match(/position (\d+)/);
-      let line = 1, column = 1;
-      if (match) {
-        const offset = parseInt(match[1]!, 10);
-        const before = val.slice(0, offset).split("\n");
-        line = before.length;
-        column = (before[before.length - 1] ?? "").length + 1;
+
+    const valResult = validateJSON(val);
+    if (valResult.valid) {
+      if (valResult.warnings && valResult.warnings.length > 0) {
+        const w = valResult.warnings[0]!;
+        setStatus({
+          type: "warning",
+          message: w.message,
+          line: w.line,
+          column: w.column,
+          key: w.key,
+          value: w.value,
+          warningType: w.warningType,
+        });
+      } else {
+        setStatus({ type: "valid" });
       }
-      setStatus({ type: "error", message: msg, line, column });
+      setFormatError(null);
+    } else {
+      setStatus({
+        type: "error",
+        message: valResult.message,
+        line: valResult.line,
+        column: valResult.column,
+      });
     }
   }
 
@@ -457,6 +513,9 @@ export default function JsonEditor({ initialInput, inputPlaceholder }: JsonEdito
       setOutput("");
       setStatus({ type: "error", message: result.error, line: result.line, column: result.column });
       setFormatError({ message: result.error, line: result.line, column: result.column });
+      if (result.error.includes("safe integer limit")) {
+        showToast({ kind: "warning", message: result.error });
+      }
     }
   }
 
@@ -472,6 +531,9 @@ export default function JsonEditor({ initialInput, inputPlaceholder }: JsonEdito
       setOutput("");
       setStatus({ type: "error", message: result.error, line: result.line, column: result.column });
       setFormatError({ message: result.error, line: result.line, column: result.column });
+      if (result.error.includes("safe integer limit")) {
+        showToast({ kind: "warning", message: result.error });
+      }
     }
   }
 
@@ -875,7 +937,7 @@ export default function JsonEditor({ initialInput, inputPlaceholder }: JsonEdito
                   margin: "0 0 4px 0",
                   letterSpacing: "-0.3px",
                 }}>
-                  Invalid JSON
+                  {formatError.message.includes("safe integer limit") ? "Precision Warning" : "Invalid JSON"}
                 </h3>
                 <p style={{
                   fontSize: "12.5px",
@@ -889,28 +951,30 @@ export default function JsonEditor({ initialInput, inputPlaceholder }: JsonEdito
                 </p>
               </div>
 
-              <button
-                onClick={handleRepair}
-                style={{
-                  marginTop: "4px",
-                  padding: "6px 16px",
-                  fontSize: "13px",
-                  fontWeight: 500,
-                  borderRadius: "var(--radius-sm)",
-                  border: "1px solid rgba(245, 166, 35, 0.4)",
-                  background: "rgba(245, 166, 35, 0.14)",
-                  color: "#b07000",
-                  cursor: "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  transition: "opacity 0.1s",
-                }}
-                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = "0.8")}
-                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = "1")}
-              >
-                🔧 Try Repair
-              </button>
+              {!formatError.message.includes("safe integer limit") && (
+                <button
+                  onClick={handleRepair}
+                  style={{
+                    marginTop: "4px",
+                    padding: "6px 16px",
+                    fontSize: "13px",
+                    fontWeight: 500,
+                    borderRadius: "var(--radius-sm)",
+                    border: "1px solid rgba(245, 166, 35, 0.4)",
+                    background: "rgba(245, 166, 35, 0.14)",
+                    color: "#b07000",
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    transition: "opacity 0.1s",
+                  }}
+                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.opacity = "0.8")}
+                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.opacity = "1")}
+                >
+                  🔧 Try Repair
+                </button>
+              )}
             </div>
           )}
 
@@ -972,6 +1036,8 @@ export default function JsonEditor({ initialInput, inputPlaceholder }: JsonEdito
         /* CodeMirror lint squiggly — works alongside built-in CM lint styles */
         .cm-diagnostic-error { border-bottom: 2px wavy var(--color-error, #ee0000); }
         .cm-lint-marker-error { color: var(--color-error, #ee0000); }
+        .cm-diagnostic-warning { border-bottom: 2px wavy var(--color-warning, #f59e0b); }
+        .cm-lint-marker-warning { color: var(--color-warning, #f59e0b); }
         .cm-tooltip.cm-tooltip-lint {
           background: var(--color-canvas) !important;
           border: 1px solid var(--color-hairline) !important;
@@ -1109,6 +1175,36 @@ function StatusBadge({ status }: { status: StatusState }) {
   }
   if (status.type === "valid") {
     return <span style={{ color: "var(--color-success)", fontWeight: 500 }}>✓ Valid JSON</span>;
+  }
+  if (status.type === "warning") {
+    if (status.warningType === "escape-path") {
+      return (
+        <span
+          style={{ color: "var(--color-warning, #f59e0b)", fontWeight: 500 }}
+          title={status.message}
+        >
+          ⚠ Unescaped Windows path at line {status.line}, col {status.column}
+        </span>
+      );
+    }
+    if (status.warningType === "unsafe-integer" || status.value) {
+      return (
+        <span
+          style={{ color: "var(--color-warning, #f59e0b)", fontWeight: 500 }}
+          title={status.message}
+        >
+          ⚠ Large integer {status.value ?? ""} exceeds safe precision at line {status.line}, col {status.column}
+        </span>
+      );
+    }
+    return (
+      <span
+        style={{ color: "var(--color-warning, #f59e0b)", fontWeight: 500 }}
+        title={status.message}
+      >
+        ⚠ Duplicate key "{status.key ?? ""}" at line {status.line}, col {status.column}
+      </span>
+    );
   }
   if (status.type === "repaired") {
     return (

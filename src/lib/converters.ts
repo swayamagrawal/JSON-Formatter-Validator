@@ -2,7 +2,15 @@
 // Phase 5 conversion utilities — JSON↔CSV, JSON↔YAML, JSON Diff
 // All 100% client-side, zero server calls.
 
-import { dump as yamlDump, load as yamlLoad } from "js-yaml";
+import {
+  dump as yamlDump,
+  load as yamlLoad,
+  CORE_SCHEMA,
+  intCoreTag,
+  defineScalarTag,
+  NOT_RESOLVED,
+} from "js-yaml";
+import { findUnsafeIntegers } from "./formatters";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,6 +59,15 @@ type JsonArray = JsonValue[];
 function safeParse(jsonString: string, label = "JSON"): JsonValue {
   const trimmed = jsonString.trim();
   if (!trimmed) throw new Error(`${label} input is empty`);
+
+  const unsafeInts = findUnsafeIntegers(trimmed);
+  if (unsafeInts.length > 0) {
+    const u = unsafeInts[0]!;
+    throw new Error(
+      `Cannot safely process ${label}: integer ${u.value} exceeds JavaScript's safe integer limit (${Number.MAX_SAFE_INTEGER}) and will lose precision. Store large IDs as strings to preserve precision.`
+    );
+  }
+
   try {
     return JSON.parse(trimmed);
   } catch (e) {
@@ -95,15 +112,36 @@ function escapeCsvCell(value: string): string {
  * Arrays inside objects are serialised as JSON strings in the cell.
  */
 export function jsonToCsv(jsonString: string): ConversionOutcome {
+  const trimmed = jsonString.trim();
+  const unsafeInts = findUnsafeIntegers(trimmed);
+  if (unsafeInts.length > 0) {
+    const u = unsafeInts[0]!;
+    return {
+      success: false,
+      error: `Cannot safely convert to CSV: integer ${u.value} exceeds JavaScript's safe integer limit (${Number.MAX_SAFE_INTEGER}) and will lose precision. Store large IDs as strings to preserve precision.`,
+    };
+  }
+
   try {
     const parsed = safeParse(jsonString);
 
-    if (!Array.isArray(parsed)) {
+    if (parsed === null || typeof parsed !== "object") {
       return {
         success: false,
         error:
-          "CSV conversion needs a JSON array of objects. Your input is not an array — wrap it in [ ] or check the format.",
+          "CSV conversion requires a JSON object or an array of objects. Primitive values cannot be converted to CSV table rows.",
       };
+    }
+
+    if (!Array.isArray(parsed)) {
+      if (Object.keys(parsed).length === 0) {
+        return { success: true, output: "" };
+      }
+      const row = flattenObject(parsed as JsonObject);
+      const allKeys = Object.keys(row);
+      const headerRow = allKeys.map(escapeCsvCell).join(",");
+      const dataRow = allKeys.map((key) => escapeCsvCell(row[key] ?? "")).join(",");
+      return { success: true, output: `${headerRow}\n${dataRow}` };
     }
 
     if (parsed.length === 0) {
@@ -151,6 +189,16 @@ export function jsonToCsv(jsonString: string): ConversionOutcome {
  * Returns a clean, human-readable YAML string.
  */
 export function jsonToYaml(jsonString: string, indent: 2 | 4 = 2): ConversionOutcome {
+  const trimmed = jsonString.trim();
+  const unsafeInts = findUnsafeIntegers(trimmed);
+  if (unsafeInts.length > 0) {
+    const u = unsafeInts[0]!;
+    return {
+      success: false,
+      error: `Cannot safely convert to YAML: integer ${u.value} exceeds JavaScript's safe integer limit (${Number.MAX_SAFE_INTEGER}) and will lose precision. Store large IDs as strings to preserve precision.`,
+    };
+  }
+
   try {
     const parsed = safeParse(jsonString);
     const output = yamlDump(parsed, {
@@ -168,6 +216,60 @@ export function jsonToYaml(jsonString: string, indent: 2 | 4 = 2): ConversionOut
   }
 }
 
+const MAX_SAFE_INT = BigInt(Number.MAX_SAFE_INTEGER); // 9007199254740991n
+const MIN_SAFE_INT = BigInt(Number.MIN_SAFE_INTEGER); // -9007199254740991n
+
+/**
+ * Custom scalar tag that wraps the default YAML 1.2 int tag.
+ * Detects integer literals (decimal, hex, octal, binary) that exceed
+ * JavaScript's safe integer range (±9,007,199,254,740,991) before js-yaml
+ * can round them into IEEE 754 float64 numbers.
+ */
+const safeIntTag = defineScalarTag("tag:yaml.org,2002:int", {
+  implicit: true,
+  implicitFirstChars: ["-", "+", ..."0123456789"],
+  resolve: (source, isExplicit, tagName) => {
+    const orig = intCoreTag.resolve(source, isExplicit, tagName);
+    if (orig === NOT_RESOLVED) return NOT_RESOLVED;
+
+    try {
+      let val = source;
+      let sign = 1n;
+      if (val[0] === "-" || val[0] === "+") {
+        if (val[0] === "-") sign = -1n;
+        val = val.slice(1);
+      }
+
+      let big: bigint | undefined;
+      if (val.startsWith("0b") || val.startsWith("0B")) {
+        big = sign * BigInt("0b" + val.slice(2));
+      } else if (val.startsWith("0o") || val.startsWith("0O")) {
+        big = sign * BigInt("0o" + val.slice(2));
+      } else if (val.startsWith("0x") || val.startsWith("0X")) {
+        big = sign * BigInt("0x" + val.slice(2));
+      } else if (/^\d+$/.test(val)) {
+        big = sign * BigInt(val);
+      }
+
+      if (big !== undefined && (big > MAX_SAFE_INT || big < MIN_SAFE_INT)) {
+        throw new Error(
+          `Cannot safely convert to JSON: integer ${source} exceeds JavaScript's safe integer limit (${Number.MAX_SAFE_INTEGER}) and will lose precision. Store large IDs as quoted strings in YAML to preserve precision.`
+        );
+      }
+    } catch (e) {
+      if (e instanceof Error && e.message.startsWith("Cannot safely convert")) {
+        throw e;
+      }
+    }
+
+    return orig;
+  },
+  identify: intCoreTag.identify,
+  represent: intCoreTag.represent,
+});
+
+const safeYamlSchema = CORE_SCHEMA.withTags(safeIntTag);
+
 /**
  * Convert a YAML string back to JSON (reverse direction).
  */
@@ -175,7 +277,7 @@ export function yamlToJson(yamlString: string): ConversionOutcome {
   try {
     const trimmed = yamlString.trim();
     if (!trimmed) throw new Error("YAML input is empty");
-    const parsed = yamlLoad(trimmed);
+    const parsed = yamlLoad(trimmed, { schema: safeYamlSchema });
     return { success: true, output: JSON.stringify(parsed, null, 2) };
   } catch (e) {
     return {
@@ -264,6 +366,33 @@ function deepCompare(
  * Compare two JSON strings and return a structured diff result.
  */
 export function jsonDiff(jsonStringA: string, jsonStringB: string): DiffOutcome {
+  const trimmedA = jsonStringA.trim();
+  const trimmedB = jsonStringB.trim();
+
+  const unsafeA = findUnsafeIntegers(trimmedA);
+  const unsafeB = findUnsafeIntegers(trimmedB);
+
+  if (unsafeA.length > 0 && unsafeB.length > 0) {
+    return {
+      success: false,
+      error: `Cannot safely diff: JSON A and JSON B contain integers exceeding JavaScript's safe integer limit (${Number.MAX_SAFE_INTEGER}) and will lose precision. Store large IDs as strings to preserve precision.`,
+    };
+  }
+  if (unsafeA.length > 0) {
+    const u = unsafeA[0]!;
+    return {
+      success: false,
+      error: `Cannot safely diff: JSON A contains integer ${u.value} which exceeds JavaScript's safe integer limit (${Number.MAX_SAFE_INTEGER}) and will lose precision. Store large IDs as strings to preserve precision.`,
+    };
+  }
+  if (unsafeB.length > 0) {
+    const u = unsafeB[0]!;
+    return {
+      success: false,
+      error: `Cannot safely diff: JSON B contains integer ${u.value} which exceeds JavaScript's safe integer limit (${Number.MAX_SAFE_INTEGER}) and will lose precision. Store large IDs as strings to preserve precision.`,
+    };
+  }
+
   try {
     const parsedA = safeParse(jsonStringA, "JSON A");
     const parsedB = safeParse(jsonStringB, "JSON B");
