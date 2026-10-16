@@ -34,7 +34,7 @@ const breadcrumbLd = {
   "@type": "BreadcrumbList",
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quietjson.com" },
-    { "@type": "ListItem", "position": 2, "name": "JSON to CSV Converter", "item": "https://quietjson.com/json-to-csv" }
+    { "@type": "ListItem", "position": 2, "name": "JSON to CSV Converter", "item": "https://quietjson.com/json-to-csv/" }
   ]
 };
 ---
@@ -42,7 +42,7 @@ const breadcrumbLd = {
 <Layout
   title="JSON to CSV Converter — Free Online Tool | QuietJSON"
   description="Convert JSON array of objects to CSV instantly. Nested objects flattened with dot notation. 100% client-side, no data leaves your browser."
-  canonical="https://quietjson.com/json-to-csv"
+  canonical="https://quietjson.com/json-to-csv/"
 >
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
@@ -149,9 +149,9 @@ const breadcrumbLd = {
         <p style="font-size: 13px; font-weight: 600; color: var(--color-mute); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 12px 0;">Also try</p>
         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
           <a href="/" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON Formatter &amp; Validator</a>
-          <a href="/json-to-yaml" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON to YAML Converter</a>
-          <a href="/json-diff" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON Diff Tool</a>
-          <a href="/json-repair" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON Repair Tool</a>
+          <a href="/json-to-yaml/" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON to YAML Converter</a>
+          <a href="/json-diff/" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON Diff Tool</a>
+          <a href="/json-repair/" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON Repair Tool</a>
         </div>
       </section>
 

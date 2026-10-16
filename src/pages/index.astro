@@ -41,6 +41,10 @@ const faqItems = [
     answer: "QuietJSON runs 100% client-side in your browser, meaning your data never leaves your computer. It features instant format switching (2 spaces, 4 spaces, tabs), intelligent error repair, an interactive Tree View, and zero advertisements or rate limits."
   },
   {
+    question: "What is a JSON linter?",
+    answer: "A JSON linter analyzes your JSON code against official RFC 8259 syntax specifications to detect syntax errors, structural flaws, improper escaping, trailing commas, or invalid data types. QuietJSON provides real-time in-browser linting with exact line and column error indicators."
+  },
+  {
     question: "Is my JSON data uploaded anywhere or stored on a server?",
     answer: "No. All parsing, formatting, validation, and tree rendering take place entirely inside your browser using local JavaScript. No data, API keys, or text snippets are ever transmitted over the network or saved to any remote server."
   },
@@ -52,8 +56,8 @@ const faqItems = [
 ---
 
 <Layout
-  title="Online JSON Formatter & Validator — Free JSON Checker | QuietJSON"
-  description="Format, validate, check, and auto-repair JSON online for free. 100% private and client-side pretty JSON formatter with tree view, minify, and instant syntax validation."
+  title="Online JSON Formatter, Validator & Linter — Free JSON Checker | QuietJSON"
+  description="Format, validate, lint, check, and auto-repair JSON online for free. 100% private and client-side pretty JSON formatter with tree view, minify, and instant syntax validation."
   canonical="https://quietjson.com/"
 >
   <!-- FAQ Schema.org JSON-LD for rich snippets -->
@@ -118,7 +122,7 @@ const faqItems = [
         line-height: 1.25;
         word-break: break-word;
       ">
-        Free Online JSON Formatter &amp; Validator
+        Free Online JSON Formatter, Validator &amp; Linter
       </h1>
       <p style="
         font-size: 14px;
@@ -126,7 +130,7 @@ const faqItems = [
         margin: 0;
         line-height: 1.45;
       ">
-        Paste or upload raw JSON to instantly format, validate, and beautify your code. 100% free, 100% client-side — your data never leaves your browser.
+        Paste or upload raw JSON to instantly format, lint, validate, and beautify your code. 100% free, 100% client-side — your data never leaves your browser.
       </p>
     </div>
 
@@ -360,25 +364,25 @@ const faqItems = [
       ">
         {[
           {
-            href: "/json-repair",
+            href: "/json-repair/",
             title: "JSON Repair Tool",
             desc: "Instantly fix broken or invalid JSON from ChatGPT, Python dicts, single quotes, and missing brackets.",
             badge: "Auto-Fix"
           },
           {
-            href: "/json-to-csv",
+            href: "/json-to-csv/",
             title: "JSON to CSV Converter",
             desc: "Convert arrays of JSON objects into spreadsheet-ready CSV files with automatic dot-notation key flattening.",
             badge: "Export"
           },
           {
-            href: "/json-to-yaml",
+            href: "/json-to-yaml/",
             title: "JSON to YAML Converter",
             desc: "Convert JSON configuration files into clean, readable YAML format with one-click bi-directional flipping.",
             badge: "Convert"
           },
           {
-            href: "/json-diff",
+            href: "/json-diff/",
             title: "JSON Diff Tool",
             desc: "Compare two JSON objects side-by-side to pinpoint added, removed, and modified values with full JSONPath.",
             badge: "Compare"

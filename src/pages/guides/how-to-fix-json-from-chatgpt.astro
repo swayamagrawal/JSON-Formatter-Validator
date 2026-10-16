@@ -2,18 +2,49 @@
 // src/pages/guides/how-to-fix-json-from-chatgpt.astro
 import Layout from "../../layouts/Layout.astro";
 
-const pageTitle = "How to Fix JSON from ChatGPT, Claude & Gemini";
-const pageDesc = "ChatGPT, Claude, and Gemini often generate invalid JSON. Learn the 5 most common LLM JSON errors and how to fix them instantly — free online repair tool.";
-const canonical = "https://quietjson.com/guides/how-to-fix-json-from-chatgpt";
-const lastUpdated = "September 2026";
+const pageTitle = "How to Fix Broken JSON from ChatGPT, Claude & LLMs (Instant Repair)";
+const pageDesc = "ChatGPT, Claude, and Gemini often output invalid JSON. Learn the 5 common LLM syntax errors and how to fix broken JSON instantly online for free.";
+const canonical = "https://quietjson.com/guides/how-to-fix-json-from-chatgpt/";
+const lastUpdated = "October 2026";
 
 const breadcrumbLd = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quietjson.com" },
-    { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://quietjson.com/guides" },
+    { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://quietjson.com/guides/" },
     { "@type": "ListItem", "position": 3, "name": "How to Fix JSON from ChatGPT", "item": canonical }
+  ]
+};
+
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Why does ChatGPT output invalid or broken JSON?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ChatGPT is a probabilistic language model, not a deterministic JSON compiler. It frequently generates conversational markdown code fences (```json), unquoted property keys, trailing commas before closing braces, or Python constants (True/False/None) that violate RFC 8259 JSON standards."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How can I automatically fix broken JSON from ChatGPT?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You can paste the broken output into QuietJSON Repair Tool (quietjson.com/json-repair/). It parses malformed tokens, replaces single quotes with double quotes, strips trailing commas, quotes naked keys, and converts Python booleans in a single click locally in your browser."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I prompt ChatGPT to always return valid JSON?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Add strict formatting constraints to your prompt: 'Respond only with a valid RFC 8259 JSON object. Do not include markdown code blocks, conversational introductions, trailing commas, or single quotes.' In OpenAI API calls, set response_format: { type: 'json_object' }."
+      }
+    }
   ]
 };
 
@@ -23,7 +54,7 @@ const articleLd = {
   "headline": pageTitle,
   "description": pageDesc,
   "datePublished": "2026-09-07",
-  "dateModified": "2026-09-07",
+  "dateModified": "2026-10-16",
   "author": { "@type": "Organization", "name": "QuietJSON", "url": "https://quietjson.com" },
   "publisher": { "@type": "Organization", "name": "QuietJSON", "url": "https://quietjson.com" },
   "mainEntityOfPage": canonical
@@ -33,6 +64,7 @@ const articleLd = {
 <Layout title={pageTitle} description={pageDesc} canonical={canonical}>
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(articleLd)} />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(faqLd)} />
 
   <div style="max-width: 760px; width: 100%; margin: 0 auto; padding: 24px 16px 64px; box-sizing: border-box;">
 
@@ -58,7 +90,7 @@ const articleLd = {
         <p style="font-size: 14px; font-weight: 600; color: var(--color-ink); margin: 0 0 3px 0;">Fix it automatically — free</p>
         <p style="font-size: 13px; color: var(--color-body); margin: 0;">Paste broken JSON, get valid JSON in one click. 100% private.</p>
       </div>
-      <a href="/json-repair" style="display: inline-block; padding: 9px 18px; background: var(--color-link); color: #fff; font-size: 13.5px; font-weight: 600; border-radius: var(--radius-md); text-decoration: none; white-space: nowrap;">Try JSON Repair &#8594;</a>
+      <a href="/json-repair/" style="display: inline-block; padding: 9px 18px; background: var(--color-link); color: #fff; font-size: 13.5px; font-weight: 600; border-radius: var(--radius-md); text-decoration: none; white-space: nowrap;">Try JSON Repair &#8594;</a>
     </div>
 
     <h2 style="font-size: 20px; font-weight: 700; color: var(--color-ink); margin: 0 0 24px 0;">The 5 Most Common LLM JSON Errors</h2>
@@ -150,7 +182,7 @@ const articleLd = {
     <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 36px;">
       <div style="padding: 16px 18px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md);">
         <p style="font-size: 14px; font-weight: 700; color: var(--color-ink); margin: 0 0 6px 0;">Method 1 — Use QuietJSON Repair Tool (Fastest)</p>
-        <p style="font-size: 13.5px; color: var(--color-body); line-height: 1.7; margin: 0;">Paste your broken JSON at <a href="/json-repair" style="color: var(--color-link);">quietjson.com/json-repair</a> and click Repair. Fixes all 5 error types automatically. 100% client-side — your data never leaves your browser.</p>
+        <p style="font-size: 13.5px; color: var(--color-body); line-height: 1.7; margin: 0;">Paste your broken JSON at <a href="/json-repair/" style="color: var(--color-link);">quietjson.com/json-repair/</a> and click Repair. Fixes all 5 error types automatically. 100% client-side — your data never leaves your browser.</p>
       </div>
       <div style="padding: 16px 18px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md);">
         <p style="font-size: 14px; font-weight: 700; color: var(--color-ink); margin: 0 0 6px 0;">Method 2 — Fix in Your Prompt</p>
@@ -165,7 +197,7 @@ const articleLd = {
     <div style="padding: 20px 22px; background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); text-align: center;">
       <p style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0 0 8px 0;">Fix your JSON now — free</p>
       <p style="font-size: 13.5px; color: var(--color-body); margin: 0 0 14px 0;">No signup. No upload. 100% private. Works on any LLM output.</p>
-      <a href="/json-repair" style="display: inline-block; padding: 10px 24px; background: var(--color-link); color: #fff; font-size: 14px; font-weight: 600; border-radius: var(--radius-md); text-decoration: none;">Open JSON Repair Tool &#8594;</a>
+      <a href="/json-repair/" style="display: inline-block; padding: 10px 24px; background: var(--color-link); color: #fff; font-size: 14px; font-weight: 600; border-radius: var(--radius-md); text-decoration: none;">Open JSON Repair Tool &#8594;</a>
     </div>
 
   </div>

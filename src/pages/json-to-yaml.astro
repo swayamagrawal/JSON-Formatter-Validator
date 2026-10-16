@@ -46,7 +46,7 @@ const breadcrumbLd = {
   "@type": "BreadcrumbList",
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quietjson.com" },
-    { "@type": "ListItem", "position": 2, "name": "JSON to YAML Converter", "item": "https://quietjson.com/json-to-yaml" }
+    { "@type": "ListItem", "position": 2, "name": "JSON to YAML Converter", "item": "https://quietjson.com/json-to-yaml/" }
   ]
 };
 ---
@@ -54,7 +54,7 @@ const breadcrumbLd = {
 <Layout
   title="JSON to YAML Converter — Online, Fast & Private | QuietJSON"
   description="Convert JSON to YAML (and YAML to JSON) instantly. Features 2-space & 4-space indentation, syntax validation, and 100% private in-browser execution."
-  canonical="https://quietjson.com/json-to-yaml"
+  canonical="https://quietjson.com/json-to-yaml/"
 >
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
@@ -268,7 +268,7 @@ resources:
           <h3 style="font-size: 14.5px; font-weight: 600; color: var(--color-ink); margin: 3px 0 2px 0;">Need to format or compare your JSON?</h3>
           <p style="font-size: 13px; color: var(--color-body); margin: 0;">Explore step-by-step developer tutorials on JSON formatting, validation, and semantic diffing.</p>
         </div>
-        <a href="/guides" style="padding: 6px 14px; font-size: 13px; font-weight: 500; color: var(--color-link); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); text-decoration: none; background: var(--color-canvas); white-space: nowrap;">
+        <a href="/guides/" style="padding: 6px 14px; font-size: 13px; font-weight: 500; color: var(--color-link); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); text-decoration: none; background: var(--color-canvas); white-space: nowrap;">
           View All Guides &rarr;
         </a>
       </section>
@@ -278,9 +278,9 @@ resources:
         <p style="font-size: 13px; font-weight: 600; color: var(--color-mute); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 12px 0;">Also try</p>
         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
           <a href="/" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON Formatter &amp; Validator</a>
-          <a href="/json-to-csv" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON to CSV Converter</a>
-          <a href="/json-diff" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON Diff Tool</a>
-          <a href="/json-repair" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON Repair Tool</a>
+          <a href="/json-to-csv/" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON to CSV Converter</a>
+          <a href="/json-diff/" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON Diff Tool</a>
+          <a href="/json-repair/" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON Repair Tool</a>
         </div>
       </section>
 

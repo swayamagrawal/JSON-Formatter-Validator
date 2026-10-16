@@ -5,6 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   site: "https://quietjson.com", // QuietJSON — final domain
+  trailingSlash: "always",
   integrations: [
     preact(),
     sitemap({

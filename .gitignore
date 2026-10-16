@@ -25,3 +25,8 @@ pnpm-debug.log*
 
 # scratch directory
 scratch/
+
+# credentials
+*credentials*.json
+*key*.json
+quietjson-*.json

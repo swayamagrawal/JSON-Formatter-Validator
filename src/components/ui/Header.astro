@@ -3,18 +3,21 @@
 const { pathname } = Astro.url;
 
 const coreTools = [
-  { href: "/",            label: "Formatter" },
-  { href: "/json-repair", label: "Repair"    },
+  { href: "/",             label: "Formatter" },
+  { href: "/json-repair/",  label: "Repair"    },
 ];
 
 const converterTools = [
-  { href: "/json-to-csv",  label: "CSV"  },
-  { href: "/json-to-yaml", label: "YAML" },
-  { href: "/json-diff",    label: "Diff" },
+  { href: "/json-to-csv/",  label: "CSV"  },
+  { href: "/json-to-yaml/", label: "YAML" },
+  { href: "/json-diff/",    label: "Diff" },
 ];
 
 function isActive(href: string) {
-  return pathname === href || (href !== "/" && pathname.startsWith(href));
+  if (href === "/") return pathname === "/";
+  const cleanPath = pathname.endsWith("/") ? pathname : pathname + "/";
+  const cleanHref = href.endsWith("/") ? href : href + "/";
+  return cleanPath === cleanHref || cleanPath.startsWith(cleanHref);
 }
 ---
 
