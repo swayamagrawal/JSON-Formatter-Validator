@@ -51,6 +51,7 @@ export default function JsonToYaml() {
   const [error, setError] = useState<string | null>(null);
   const [direction, setDirection] = useState<Direction>("json-to-yaml");
   const [copied, setCopied] = useState(false);
+  const [indent, setIndent] = useState<2 | 4>(2);
 
   const inputLabel = direction === "json-to-yaml" ? "JSON Input" : "YAML Input";
   const outputLabel = direction === "json-to-yaml" ? "YAML Output" : "JSON Output";
@@ -59,7 +60,7 @@ export default function JsonToYaml() {
 
   function handleConvert() {
     if (!input.trim()) return;
-    const result = direction === "json-to-yaml" ? jsonToYaml(input) : yamlToJson(input);
+    const result = direction === "json-to-yaml" ? jsonToYaml(input, indent) : yamlToJson(input);
     if (result.success) {
       setOutput(result.output);
       setError(null);
@@ -137,6 +138,28 @@ export default function JsonToYaml() {
         }}>
           {direction === "json-to-yaml" ? "JSON → YAML" : "YAML → JSON"}
         </span>
+
+        {/* Indent toggle — only shown in JSON→YAML mode */}
+        {direction === "json-to-yaml" && (
+          <div style={{ display: "flex", alignItems: "center", gap: "4px", background: "var(--color-canvas-soft)", border: "1px solid var(--color-hairline)", borderRadius: "var(--radius-sm)", padding: "2px" }}>
+            <span style={{ fontSize: "11px", color: "var(--color-mute)", padding: "0 6px", fontFamily: "var(--font-mono)" }}>indent:</span>
+            {([2, 4] as const).map(n => (
+              <button
+                key={n}
+                onClick={() => setIndent(n)}
+                title={`${n}-space indentation`}
+                style={{
+                  padding: "3px 10px", fontSize: "12px", fontFamily: "var(--font-mono)", fontWeight: 600,
+                  border: "1px solid", borderRadius: "calc(var(--radius-sm) - 2px)", cursor: "pointer",
+                  transition: "all 0.1s",
+                  background: indent === n ? "var(--color-ink)" : "transparent",
+                  color: indent === n ? "var(--color-canvas)" : "var(--color-mute)",
+                  borderColor: indent === n ? "var(--color-ink)" : "transparent",
+                }}
+              >{n}</button>
+            ))}
+          </div>
+        )}
 
         <div class="toolbar-upload" style={{ marginLeft: "auto" }}>
           <label style={{

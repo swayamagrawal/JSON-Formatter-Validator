@@ -150,11 +150,11 @@ export function jsonToCsv(jsonString: string): ConversionOutcome {
  * Convert a JSON string to YAML using js-yaml.
  * Returns a clean, human-readable YAML string.
  */
-export function jsonToYaml(jsonString: string): ConversionOutcome {
+export function jsonToYaml(jsonString: string, indent: 2 | 4 = 2): ConversionOutcome {
   try {
     const parsed = safeParse(jsonString);
     const output = yamlDump(parsed, {
-      indent: 2,
+      indent,
       lineWidth: 120,
       noRefs: true,
       quotingType: '"',
