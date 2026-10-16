@@ -5,16 +5,28 @@ import JsonToYaml from "../components/islands/JsonToYaml";
 
 const faqItems = [
   {
-    question: "What is the difference between JSON and YAML?",
-    answer: "JSON uses strict delimiter syntax with braces {} and brackets [] for structure, making it ideal for machine-to-machine data interchange. YAML uses indentation and whitespace, making it more concise and easier for humans to read and edit in configuration files (such as Docker, Kubernetes, and CI/CD pipelines)."
+    question: "What is the primary difference between JSON and YAML?",
+    answer: "JSON uses strict structural delimiters such as curly braces {}, square brackets [], and double quotes for keys and strings, making it optimal for machine parsing and high-throughput web APIs. YAML relies on indentation and clean whitespace hierarchy, eliminating brackets and quotes for unquoted scalars, making it far more human-readable for configuration files like Kubernetes manifests, Docker Compose, and CI/CD pipelines."
   },
   {
-    question: "Can I convert YAML back to JSON too?",
-    answer: "Yes. You can click the \"⇄ Flip Direction\" button in the toolbar to switch the tool to YAML-to-JSON mode. This allows you to paste YAML configuration snippets and instantly convert them into valid, formatted JSON."
+    question: "Should I use 2 spaces or 4 spaces for YAML indentation?",
+    answer: "2-space indentation is the universal standard in the cloud-native ecosystem, including Kubernetes, GitHub Actions, Helm, and Docker Compose. However, 4-space indentation is commonly used in Ansible and Python projects. QuietJSON provides a 2-space / 4-space toggle in the toolbar so you can match your team's exact linting and formatting standards."
   },
   {
-    question: "Does this tool preserve comments when converting?",
-    answer: "Because standard JSON specifications do not support comments, converting YAML containing comments into JSON will strip those comments during parsing. When converting from JSON to YAML, the output is generated cleanly from the parsed data structures."
+    question: "Can I convert YAML back to JSON?",
+    answer: "Yes. QuietJSON is fully bi-directional. Click the \"⇄ Flip Direction\" button in the toolbar to switch to YAML-to-JSON mode. You can paste any valid YAML document, and it will immediately convert into formatted, validated JSON with 2-space indentation."
+  },
+  {
+    question: "Does YAML conversion support .yml file extensions?",
+    answer: "Yes. .yaml and .yml are identical file extensions for YAML documents. The upload button accepts both .json, .yaml, and .yml files from your computer and processes them seamlessly."
+  },
+  {
+    question: "Are comments preserved when converting between YAML and JSON?",
+    answer: "Because standard JSON (RFC 8259) does not support comments, converting YAML containing comments (# ...) into JSON will omit those comments during the parsing phase. When converting from JSON to YAML, the generated YAML document is built cleanly from the parsed data structures without comments."
+  },
+  {
+    question: "Is my proprietary configuration data secure using this tool?",
+    answer: "Yes, 100%. QuietJSON executes all YAML and JSON parsing locally inside your web browser using client-side JavaScript (js-yaml). No configuration files, environment variables, credentials, or secrets are ever sent to a remote server or logged."
   }
 ];
 
@@ -27,7 +39,7 @@ const jsonLd = {
     "acceptedAnswer": { "@type": "Answer", "text": f.answer },
   })),
 };
-const lastUpdated = "September 2026";
+const lastUpdated = "October 2026";
 
 const breadcrumbLd = {
   "@context": "https://schema.org",
@@ -40,8 +52,8 @@ const breadcrumbLd = {
 ---
 
 <Layout
-  title="JSON to YAML Converter — Free Online Tool | QuietJSON"
-  description="Convert JSON to YAML instantly online. Supports reverse YAML to JSON too. 100% client-side using js-yaml — your data never leaves the browser."
+  title="JSON to YAML Converter — Online, Fast & Private | QuietJSON"
+  description="Convert JSON to YAML (and YAML to JSON) instantly. Features 2-space & 4-space indentation, syntax validation, and 100% private in-browser execution."
   canonical="https://quietjson.com/json-to-yaml"
 >
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
@@ -51,10 +63,10 @@ const breadcrumbLd = {
     <!-- Heading -->
     <div style="margin-bottom: 16px;">
       <h1 style="font-size: clamp(20px, 4.5vw, 24px); font-weight: 600; letter-spacing: -0.4px; color: var(--color-ink); margin: 0 0 6px 0; line-height: 1.3; word-break: break-word;">
-        JSON to YAML Converter
+        JSON to YAML Converter — Online, Free &amp; Bi-Directional
       </h1>
       <p style="font-size: 14px; color: var(--color-body); margin: 0; line-height: 1.5;">
-        Convert JSON to YAML (or YAML back to JSON) instantly — flip direction with one click.
+        Convert JSON to YAML (or YAML back to JSON) instantly. Toggle between 2-space and 4-space indentation with 100% private in-browser conversion.
       </p>
     </div>
 
@@ -72,32 +84,137 @@ const breadcrumbLd = {
   <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
     <div style="max-width: 760px;">
 
-      <section style="margin-bottom: 48px;">
-        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
-          Why Convert JSON to YAML?
+      <section style="margin-bottom: 44px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Why Convert JSON to YAML? (The Cloud &amp; DevOps Standard)
         </h2>
-        <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0 0 12px 0;">
-          JSON is the preferred format for APIs and data exchange, but YAML is the go-to format for
-          configuration files. Docker Compose, Kubernetes manifests, GitHub Actions workflows, Ansible
-          playbooks, and many CI/CD tools all use YAML because it's far more readable — no curly braces,
-          no quotes for simple strings, and natural nesting through indentation.
+        <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.8; margin: 0 0 14px 0;">
+          While <strong>JSON (JavaScript Object Notation)</strong> remains the universal data interchange format for REST APIs, databases, and network requests, <strong>YAML (YAML Ain't Markup Language)</strong> has become the de-facto standard for DevOps configurations. Major developer platforms — including <strong>Kubernetes, Docker Compose, GitHub Actions, Helm, Ansible, and GitLab CI/CD</strong> — rely on YAML because it eliminates visual clutter.
         </p>
-        <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0;">
-          This tool converts in both directions. Need to pull a value from a Kubernetes YAML into a JSON
-          API payload? Flip the direction and convert back in seconds.
+        <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.8; margin: 0;">
+          QuietJSON's <strong>JSON to YAML Converter</strong> parses your JSON structure and serializes it into clean, idiomatic YAML. It automatically strips unnecessary quotation marks from string keys, formats nested arrays with clean hyphens (<code>-</code>), and allows you to select between <strong>2-space and 4-space indentation</strong>.
         </p>
       </section>
 
-      <section style="margin-bottom: 48px;">
-        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
-          How to Use
+      <section style="margin-bottom: 44px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Syntax Comparison: JSON vs. YAML
         </h2>
-        <ol style="font-size: 14px; color: var(--color-body); line-height: 1.9; margin: 0; padding-left: 20px;">
-          <li>Paste your JSON (or YAML) into the left input panel.</li>
-          <li>Select your conversion direction using the <strong>⇄ Flip Direction</strong> button.</li>
-          <li>Click <strong>Convert to YAML</strong> (or <strong>Convert to JSON</strong>).</li>
-          <li>Copy the output or download it as a file.</li>
-        </ol>
+        <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.8; margin: 0 0 14px 0;">
+          Here is how the two formats compare across key engineering features:
+        </p>
+        <div style="overflow-x: auto; margin-bottom: 16px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13.5px; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--color-hairline); background: var(--color-canvas-soft);">
+                <th style="padding: 10px 14px; font-weight: 600; color: var(--color-ink);">Feature</th>
+                <th style="padding: 10px 14px; font-weight: 600; color: var(--color-ink);">JSON</th>
+                <th style="padding: 10px 14px; font-weight: 600; color: var(--color-ink);">YAML</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--color-hairline);">
+                <td style="padding: 10px 14px; font-weight: 500;">Structural Delimiters</td>
+                <td style="padding: 10px 14px; color: var(--color-body);">Braces &#123;&#125; and brackets []</td>
+                <td style="padding: 10px 14px; color: #16a34a; font-weight: 500;">Whitespace &amp; Indentation</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--color-hairline);">
+                <td style="padding: 10px 14px; font-weight: 500;">Comments Support</td>
+                <td style="padding: 10px 14px; color: #dc2626;">Not supported (RFC 8259)</td>
+                <td style="padding: 10px 14px; color: #16a34a; font-weight: 500;">Supported with #</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--color-hairline);">
+                <td style="padding: 10px 14px; font-weight: 500;">Key Quotations</td>
+                <td style="padding: 10px 14px; color: var(--color-body);">Mandatory double quotes ("key")</td>
+                <td style="padding: 10px 14px; color: #16a34a; font-weight: 500;">Optional for alphanumeric keys</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--color-hairline);">
+                <td style="padding: 10px 14px; font-weight: 500;">Trailing Commas</td>
+                <td style="padding: 10px 14px; color: #dc2626;">Syntax Error</td>
+                <td style="padding: 10px 14px; color: #16a34a; font-weight: 500;">No commas needed</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 14px; font-weight: 500;">Primary Use Case</td>
+                <td style="padding: 10px 14px; color: var(--color-body);">APIs, data transit, serialization</td>
+                <td style="padding: 10px 14px; color: var(--color-body);">Kubernetes, CI/CD, App configs</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section style="margin-bottom: 44px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          YAML Indentation: 2 Spaces vs. 4 Spaces
+        </h2>
+        <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.8; margin: 0 0 14px 0;">
+          In YAML, <strong>tabs are strictly forbidden</strong> by the official specification — hierarchy must be represented using spaces. However, different ecosystems enforce different spacing standards:
+        </p>
+        <ul style="font-size: 14.5px; color: var(--color-body); line-height: 1.85; margin: 0 0 16px 0; padding-left: 20px;">
+          <li><strong>2 Spaces (Default &amp; Recommended):</strong> The standard for Kubernetes manifests, GitHub Actions workflows, Docker Compose, and Helm templates. It keeps deep configurations compact and prevents horizontal scrolling.</li>
+          <li><strong>4 Spaces:</strong> Frequently favored by Python and Ansible developers who prefer aligning YAML indentation with Python's PEP 8 guidelines.</li>
+        </ul>
+        <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.8; margin: 0;">
+          QuietJSON features a built-in <strong>"indent: 2 | 4"</strong> toggle in the toolbar. Simply click <strong>2</strong> or <strong>4</strong> and convert to match your project's linter instantly.
+        </p>
+      </section>
+
+      <section style="margin-bottom: 44px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Visual Example: Docker &amp; Cloud Config Conversion
+        </h2>
+        <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.8; margin: 0 0 14px 0;">
+          Notice how converting complex JSON payloads into YAML transforms verbose curly braces into clean, human-readable blocks:
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; font-family: var(--font-mono, monospace); font-size: 12.5px;">
+          <div style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); padding: 12px;">
+            <div style="font-weight: 600; color: var(--color-ink); margin-bottom: 8px;">JSON Input</div>
+            <pre style="margin: 0; line-height: 1.5; white-space: pre-wrap; color: var(--color-body);">&#123;
+  "service": "auth-api",
+  "replicas": 3,
+  "environment": [
+    "NODE_ENV=production",
+    "PORT=8080"
+  ],
+  "resources": &#123;
+    "memory": "512Mi",
+    "cpu": "250m"
+  &#125;
+&#125;</pre>
+          </div>
+          <div style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); padding: 12px;">
+            <div style="font-weight: 600; color: var(--color-ink); margin-bottom: 8px;">YAML Output (2 spaces)</div>
+            <pre style="margin: 0; line-height: 1.5; white-space: pre-wrap; color: var(--color-body);">service: auth-api
+replicas: 3
+environment:
+  - NODE_ENV=production
+  - PORT=8080
+resources:
+  memory: 512Mi
+  cpu: 250m</pre>
+          </div>
+        </div>
+      </section>
+
+      <section style="margin-bottom: 44px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Bi-Directional Support: Converting YAML Back to JSON
+        </h2>
+        <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.8; margin: 0 0 14px 0;">
+          Often, developers need to reverse the process — for instance, converting a Kubernetes ConfigMap or OpenAPI YAML specification into JSON for API testing or database storage.
+        </p>
+        <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.8; margin: 0;">
+          Click the <strong>⇄ Flip Direction</strong> button in the toolbar. The tool will switch to <strong>YAML &rarr; JSON</strong> mode, moving your output into the input pane so you can convert in either direction with a single click.
+        </p>
+      </section>
+
+      <section style="margin-bottom: 44px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Privacy Guarantee: 100% In-Browser Execution
+        </h2>
+        <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.8; margin: 0;">
+          Configuration files frequently contain internal service URLs, database connection strings, or environment variable templates. QuietJSON performs <strong>100% client-side conversion</strong> using the browser's local V8 engine. No data is transmitted across the internet or stored on third-party servers.
+        </p>
       </section>
 
       <section style="margin-bottom: 48px;">
@@ -144,8 +261,20 @@ const breadcrumbLd = {
         </div>
       </section>
 
+      <!-- Related Guide — Content Cluster -->
+      <section style="margin-top: 36px; padding: 18px 20px; background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--color-link); letter-spacing: 0.5px;">Developer Guides</span>
+          <h3 style="font-size: 14.5px; font-weight: 600; color: var(--color-ink); margin: 3px 0 2px 0;">Need to format or compare your JSON?</h3>
+          <p style="font-size: 13px; color: var(--color-body); margin: 0;">Explore step-by-step developer tutorials on JSON formatting, validation, and semantic diffing.</p>
+        </div>
+        <a href="/guides" style="padding: 6px 14px; font-size: 13px; font-weight: 500; color: var(--color-link); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); text-decoration: none; background: var(--color-canvas); white-space: nowrap;">
+          View All Guides &rarr;
+        </a>
+      </section>
+
       <!-- Related Tools — internal links for SEO -->
-      <section style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--color-hairline);">
+      <section style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--color-hairline);">
         <p style="font-size: 13px; font-weight: 600; color: var(--color-mute); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 12px 0;">Also try</p>
         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
           <a href="/" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON Formatter &amp; Validator</a>
