@@ -1,0 +1,160 @@
+﻿---
+// src/pages/guides/how-to-compare-two-json-files.astro
+import Layout from "../../layouts/Layout.astro";
+
+const pageTitle = "How to Compare Two JSON Files Online (Text vs. Semantic Diff)";
+const pageDesc = "Learn how to compare two JSON files online, find differences between API payloads, and track additions, deletions, and modifications with JSONPath.";
+const canonical = "https://quietjson.com/guides/how-to-compare-two-json-files";
+const lastUpdated = "October 2026";
+
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://quietjson.com" },
+    { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://quietjson.com/guides" },
+    { "@type": "ListItem", "position": 3, "name": "How to Compare Two JSON Files", "item": canonical }
+  ]
+};
+
+const articleLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": pageTitle,
+  "description": pageDesc,
+  "datePublished": "2026-10-16",
+  "dateModified": "2026-10-16",
+  "author": { "@type": "Organization", "name": "QuietJSON", "url": "https://quietjson.com" },
+  "publisher": { "@type": "Organization", "name": "QuietJSON", "url": "https://quietjson.com" },
+  "mainEntityOfPage": canonical
+};
+
+const diffMethods = [
+  {
+    title: "1. Online In-Browser Diff (Recommended for Quick Debugging)",
+    desc: "The fastest method for comparing two payloads without installing CLI packages or uploading data. QuietJSON parses JSON into native objects in your browser and displays highlighted differences with exact JSONPaths.",
+    tag: "Fastest & Private"
+  },
+  {
+    title: "2. Command-Line Interface (jq + diff)",
+    desc: "For terminal users, formatting both files with jq sorting keys before running diff prevents false positives: diff -u <(jq -S . file1.json) <(jq -S . file2.json).",
+    tag: "CLI Workflow"
+  },
+  {
+    title: "3. Programmatic Comparison (Python deepdiff / Node.js)",
+    desc: "For automated test suites and CI/CD pipelines, libraries like Python's DeepDiff calculate detailed deltas between dictionaries and nested lists programmatically.",
+    tag: "Automation"
+  }
+];
+---
+
+<Layout title={pageTitle} description={pageDesc} canonical={canonical}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(articleLd)} />
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 pt-6 pb-16">
+
+    <nav style="font-size: 13px; color: var(--color-mute); margin-bottom: 20px;">
+      <a href="/" style="color: var(--color-link); text-decoration: none;">Home</a>
+      <span style="margin: 0 6px;">&#8250;</span>
+      <span style="color: var(--color-ink);">Compare Two JSON Files</span>
+    </nav>
+
+    <h1 style="font-size: clamp(22px, 5vw, 30px); font-weight: 700; letter-spacing: -0.5px; color: var(--color-ink); margin: 0 0 10px 0; line-height: 1.25;">
+      How to Compare Two JSON Files: The Complete Developer Guide
+    </h1>
+    <p style="font-size: 13px; color: var(--color-mute); margin: 0 0 20px 0;">
+      Last updated: {lastUpdated} &middot; 5 min read
+    </p>
+    <p style="font-size: 15.5px; color: var(--color-body); line-height: 1.75; margin: 0 0 32px 0;">
+      Comparing two JSON files is a daily task when validating API endpoint responses, reviewing database migrations, or auditing Kubernetes configuration files. However, comparing JSON like plain text frequently leads to hundreds of false differences due to indentation and key ordering. This guide explains how semantic JSON diff works and how to accurately spot genuine data changes.
+    </p>
+
+    <!-- CTA Banner -->
+    <div style="padding: 16px 20px; background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); margin-bottom: 36px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <p style="font-size: 14px; font-weight: 600; color: var(--color-ink); margin: 0 0 3px 0;">Need to diff two JSON files right now?</p>
+        <p style="font-size: 13px; color: var(--color-body); margin: 0;">Compare side-by-side with color-coded diff and JSONPath. 100% private in-browser tool.</p>
+      </div>
+      <a href="/json-diff" style="padding: 8px 16px; background: var(--color-ink); color: var(--color-canvas); font-size: 13px; font-weight: 500; border-radius: var(--radius-sm); text-decoration: none; white-space: nowrap;">
+        Open JSON Diff Tool &rarr;
+      </a>
+    </div>
+
+    <!-- Section 1 -->
+    <section style="margin-bottom: 40px;">
+      <h2 style="font-size: 19px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+        Why Standard Text Diff (git diff) Fails on JSON
+      </h2>
+      <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.75; margin: 0 0 14px 0;">
+        Standard file comparison utilities compare lines of characters. Because JSON is a structured hierarchical format rather than simple prose, text-based diff engines fail in four primary ways:
+      </p>
+      <ul style="font-size: 14.5px; color: var(--color-body); line-height: 1.85; margin: 0 0 16px 0; padding-left: 20px;">
+        <li><strong>Unordered Object Keys:</strong> In the JSON RFC specification, key/value pairs in an object have no inherent sequence. If Service A returns <code>&#123; "id": 1, "status": "active" &#125;</code> and Service B returns <code>&#123; "status": "active", "id": 1 &#125;</code>, a text diff reports two changed lines even though the data is 100% identical.</li>
+        <li><strong>Whitespace &amp; Formatting Shifts:</strong> Changing indentation from 2 spaces to 4 spaces, or formatting a minified payload, causes text diffs to flag every single line as modified.</li>
+        <li><strong>Minified Single-Line Files:</strong> When comparing production API responses minified to a single line, git diff highlights the entire 100KB file as one giant deletion and addition.</li>
+        <li><strong>Ambiguous Nested Arrays:</strong> Inserting a single item at index 0 of an array shifts all subsequent indices down, making every element appear modified in flat text comparisons.</li>
+      </ul>
+    </section>
+
+    <!-- Section 2 -->
+    <section style="margin-bottom: 40px;">
+      <h2 style="font-size: 19px; font-weight: 600; color: var(--color-ink); margin: 0 0 14px 0;">
+        3 Methods to Compare JSON Files
+      </h2>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        {diffMethods.map((m) => (
+          <div style="padding: 16px; background: var(--color-canvas); border: 1px solid var(--color-hairline); border-radius: var(--radius-md);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <h3 style="font-size: 15px; font-weight: 600; color: var(--color-ink); margin: 0;">{m.title}</h3>
+              <span style="font-size: 11px; padding: 2px 8px; border-radius: var(--radius-sm); background: var(--color-canvas-soft-2); color: var(--color-mute); font-family: var(--font-mono);">{m.tag}</span>
+            </div>
+            <p style="font-size: 13.5px; color: var(--color-body); line-height: 1.7; margin: 0;">{m.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- Section 3 -->
+    <section style="margin-bottom: 40px;">
+      <h2 style="font-size: 19px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+        Understanding RFC 9535 JSONPath in Diffing
+      </h2>
+      <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.75; margin: 0 0 14px 0;">
+        When diffing large JSON files containing hundreds of lines, knowing that "a key changed on line 428" is not helpful. What developers need is the exact path in the data tree.
+      </p>
+      <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.75; margin: 0 0 14px 0;">
+        Semantic diff tools report changes using standard <a href="https://datatracker.ietf.org/doc/html/rfc9535" target="_blank" rel="noopener noreferrer" style="color: var(--color-link); text-decoration: underline;">JSONPath notation</a>:
+      </p>
+      <div style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); padding: 14px; font-family: var(--font-mono, monospace); font-size: 13px; line-height: 1.8; color: var(--color-body);">
+        <div><strong style="color: var(--color-ink);">$.store.inventory[0].price</strong> &rarr; Price property of the first inventory item</div>
+        <div><strong style="color: var(--color-ink);">$.users[3].roles[1]</strong> &rarr; Second assigned role of the 4th user in the array</div>
+        <div><strong style="color: var(--color-ink);">$.config.auth.oauth.clientId</strong> &rarr; Deeply nested OAuth configuration parameter</div>
+      </div>
+    </section>
+
+    <!-- Section 4 -->
+    <section style="margin-bottom: 40px;">
+      <h2 style="font-size: 19px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+        Developer Best Practices When Diffing JSON
+      </h2>
+      <ol style="font-size: 14.5px; color: var(--color-body); line-height: 1.85; margin: 0; padding-left: 20px;">
+        <li><strong>Ensure Valid JSON First:</strong> If either file contains syntax errors (like trailing commas or unquoted keys), format or repair it using a <a href="/json-repair" style="color: var(--color-link); text-decoration: underline;">JSON Repair Tool</a> before diffing.</li>
+        <li><strong>Never Upload Sensitive Customer Data:</strong> Free online diff tools that send payloads to remote servers expose your database exports or API keys. Always use client-side tools like <a href="/json-diff" style="color: var(--color-link); text-decoration: underline;">QuietJSON JSON Diff Tool</a> where computations stay inside your browser sandbox.</li>
+        <li><strong>Verify Value Types:</strong> Pay close attention to subtle type conversions: <code>"100"</code> (string) vs. <code>100</code> (number), or <code>"true"</code> vs. <code>true</code>. Semantic diff engines explicitly flag these subtle bugs.</li>
+      </ol>
+    </section>
+
+    <!-- Final CTA -->
+    <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--color-hairline); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <p style="font-size: 14px; font-weight: 600; color: var(--color-ink); margin: 0 0 2px 0;">Try the QuietJSON Diff Engine</p>
+        <p style="font-size: 13px; color: var(--color-mute); margin: 0;">Recursive deep comparison, side-by-side view, 100% private.</p>
+      </div>
+      <a href="/json-diff" style="padding: 9px 18px; background: var(--color-link); color: #fff; font-size: 13px; font-weight: 500; border-radius: var(--radius-sm); text-decoration: none;">
+        Launch JSON Diff Tool &rarr;
+      </a>
+    </div>
+
+  </div>
+</Layout>

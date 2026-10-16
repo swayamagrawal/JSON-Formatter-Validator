@@ -5,16 +5,28 @@ import JsonDiff from "../components/islands/JsonDiff";
 
 const faqItems = [
   {
-    question: "How does JSON diff/comparison work?",
-    answer: "The tool recursively compares the two JSON payloads by inspecting object keys, array indices, and value types. It analyzes changes structurally rather than comparing plain text lines, ensuring accurate detection of additions, removals, and modifications."
+    question: "How does this JSON diff tool compare two JSON files?",
+    answer: "The tool recursively compares two JSON payloads by evaluating structural object keys, array indices, and primitive values. Rather than relying on simple line-by-line text matching, it builds an in-memory Abstract Syntax Tree (AST), ensuring accurate detection of semantic additions, deletions, and type modifications regardless of formatting or key order."
   },
   {
-    question: "Can I compare two JSON files with different key orders?",
-    answer: "Yes. Because the comparison is performed on parsed JSON objects rather than raw text lines, object keys are evaluated by name regardless of their position in the file. Properties with identical keys and values will not trigger false change warnings."
+    question: "Does the JSON diff ignore key order?",
+    answer: "Yes. In the JSON specification, object keys are inherently unordered collections of key/value pairs. Our diff engine parses both JSON payloads as objects and compares keys by name. Two JSON documents with identical keys in different orders will be evaluated as equal without producing false diff warnings."
   },
   {
-    question: "What do the +/−/~ symbols mean in the diff output?",
-    answer: "The green + symbol indicates a new key or value added in JSON B that was missing in JSON A. The red − symbol represents a key or value removed in JSON B. The amber ~ symbol denotes an existing key whose value or data type was modified between the two versions."
+    question: "What do the color-coded symbols (+, −, ~) represent?",
+    answer: "The green + symbol indicates a key or array element newly added in JSON B that was missing in JSON A. The red − symbol signifies a property removed in JSON B. The amber ~ symbol highlights an existing property whose value or data type was altered between the two versions."
+  },
+  {
+    question: "Can I use this tool to compare large nested JSON objects and arrays?",
+    answer: "Yes. The recursive diff engine handles deeply nested structures, multidimensional arrays, and complex objects. Every detected change includes its full RFC 9535 JSONPath (such as $.users[0].address.city), allowing you to jump directly to changes in large payloads."
+  },
+  {
+    question: "Is my JSON data secure when using this online diff tool?",
+    answer: "Yes, 100%. QuietJSON processes all comparisons locally in your browser using client-side JavaScript. Neither your original JSON nor your modified payload is ever sent to a remote server or stored in a database, making it completely safe for proprietary data, API tokens, and confidential customer payloads."
+  },
+  {
+    question: "How is a semantic JSON diff different from git diff or text diff?",
+    answer: "A standard text diff (like git diff or diff3) treats lines of text literally. It reports false positives when whitespace changes, keys are reordered, or indentation shifts from 2 spaces to 4 spaces. A semantic JSON diff understands JSON syntax, filtering out whitespace noise to show only genuine data changes."
   }
 ];
 
@@ -27,7 +39,7 @@ const jsonLd = {
     "acceptedAnswer": { "@type": "Answer", "text": f.answer },
   })),
 };
-const lastUpdated = "September 2026";
+const lastUpdated = "October 2026";
 
 const breadcrumbLd = {
   "@context": "https://schema.org",
@@ -40,8 +52,8 @@ const breadcrumbLd = {
 ---
 
 <Layout
-  title="JSON Diff — Compare Two JSON Objects Online | QuietJSON"
-  description="Compare two JSON objects side by side and see every difference. Added, removed, and changed keys highlighted with full JSONPath. 100% client-side."
+  title="JSON Diff Tool — Compare Two JSON Files Online | QuietJSON"
+  description="Compare two JSON files or objects side by side. Highlights added, removed, and modified keys with RFC 9535 JSONPath. 100% private, free, and in-browser."
   canonical="https://quietjson.com/json-diff"
 >
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
@@ -51,10 +63,10 @@ const breadcrumbLd = {
     <!-- Heading -->
     <div style="margin-bottom: 16px;">
       <h1 style="font-size: clamp(20px, 4.5vw, 24px); font-weight: 600; letter-spacing: -0.4px; color: var(--color-ink); margin: 0 0 6px 0; line-height: 1.3; word-break: break-word;">
-        JSON Diff — Compare Two JSON Objects
+        JSON Diff Tool — Compare Two JSON Files & Objects Online
       </h1>
       <p style="font-size: 14px; color: var(--color-body); margin: 0; line-height: 1.5;">
-        Paste two JSON snippets and instantly see what's added, removed, or changed — with full JSONPath.
+        Paste two JSON snippets or upload files to diff JSON instantly. Spot added, removed, and modified values with full JSONPath. 100% private and in-browser.
       </p>
     </div>
 
@@ -72,48 +84,143 @@ const breadcrumbLd = {
   <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
     <div style="max-width: 760px;">
 
-      <section style="margin-bottom: 48px;">
-        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
-          Why Use a JSON Diff Tool?
+      <section style="margin-bottom: 44px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Why Use a Semantic JSON Diff Tool?
         </h2>
-        <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0 0 12px 0;">
-          When working with API responses, configuration files, or database records, spotting what changed
-          between two versions of a JSON document can be tedious. A plain text diff shows too much noise —
-          line numbers, whitespace differences, quote styles. A JSON-aware diff ignores formatting and
-          focuses only on semantic differences in the data.
+        <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.8; margin: 0 0 14px 0;">
+          When working with modern REST APIs, GraphQL payloads, microservice configurations, or database records, finding exact differences between two JSON objects can quickly turn frustrating. Standard line-by-line comparison tools (such as Unix diff or Git diff) treat JSON documents as flat plain text. If keys are ordered differently, lines are indented with 4 spaces instead of 2 spaces, or minified onto a single line, traditional text diffs produce dozens of misleading false positives.
         </p>
-        <p style="font-size: 14px; color: var(--color-body); line-height: 1.75; margin: 0;">
-          This tool performs a recursive deep comparison and shows every difference with its
-          <strong>JSONPath</strong> — so you know exactly where in a 500-key object the change happened.
-          Differences are color-coded: <span style="color:#16a34a; font-weight:500;">green for added</span>,
-          <span style="color:#dc2626; font-weight:500;">red for removed</span>, and
-          <span style="color:#b45309; font-weight:500;">amber for changed values</span>.
+        <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.8; margin: 0;">
+          QuietJSON's <strong>JSON Diff Tool</strong> parses both input payloads into native JavaScript Abstract Syntax Trees (ASTs) and executes a <strong>recursive deep structural comparison</strong>. It ignores insignificant whitespace, line breaks, and key order variations, isolating purely semantic data differences. Every change is color-coded and tagged with its precise <a href="https://datatracker.ietf.org/doc/html/rfc9535" target="_blank" rel="noopener noreferrer" style="color: var(--color-link); text-decoration: underline;">RFC 9535 JSONPath</a>.
         </p>
       </section>
 
-      <section style="margin-bottom: 48px;">
-        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
-          Common Use Cases
+      <section style="margin-bottom: 44px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Semantic JSON Diff vs. Plain Text Diff (git diff)
         </h2>
-        <ul style="font-size: 14px; color: var(--color-body); line-height: 1.9; margin: 0; padding-left: 20px;">
-          <li><strong>API debugging</strong> — compare a request body that worked vs one that failed</li>
-          <li><strong>Config review</strong> — diff a staging vs production config before deployment</li>
-          <li><strong>Data migration</strong> — verify a record before and after transformation</li>
-          <li><strong>Code review aid</strong> — quickly understand what a JSON fixture change means</li>
-          <li><strong>Schema drift</strong> — catch when an API starts returning extra or missing fields</li>
+        <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.8; margin: 0 0 14px 0;">
+          Understanding the difference between syntactic text comparison and semantic object comparison is essential for developers debugging complex data pipelines:
+        </p>
+        <div style="overflow-x: auto; margin-bottom: 16px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13.5px; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--color-hairline); background: var(--color-canvas-soft);">
+                <th style="padding: 10px 14px; font-weight: 600; color: var(--color-ink);">Feature / Behavior</th>
+                <th style="padding: 10px 14px; font-weight: 600; color: var(--color-ink);">Standard Text Diff (git diff)</th>
+                <th style="padding: 10px 14px; font-weight: 600; color: var(--color-ink);">QuietJSON Structural Diff</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--color-hairline);">
+                <td style="padding: 10px 14px; font-weight: 500;">Key Reordering</td>
+                <td style="padding: 10px 14px; color: #dc2626;">Marks as complete delete &amp; add</td>
+                <td style="padding: 10px 14px; color: #16a34a;">Recognized as identical data</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--color-hairline);">
+                <td style="padding: 10px 14px; font-weight: 500;">Whitespace &amp; Indents</td>
+                <td style="padding: 10px 14px; color: #dc2626;">Highlights every shifted line</td>
+                <td style="padding: 10px 14px; color: #16a34a;">Ignored automatically</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--color-hairline);">
+                <td style="padding: 10px 14px; font-weight: 500;">Minified Payloads</td>
+                <td style="padding: 10px 14px; color: #dc2626;">Fails (diffs entire file on 1 line)</td>
+                <td style="padding: 10px 14px; color: #16a34a;">Parses and compares structure</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--color-hairline);">
+                <td style="padding: 10px 14px; font-weight: 500;">Location Reporting</td>
+                <td style="padding: 10px 14px; color: var(--color-mute);">Line numbers only</td>
+                <td style="padding: 10px 14px; color: #16a34a;">Exact JSONPath (e.g. $.users[0].id)</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 14px; font-weight: 500;">Type Changes</td>
+                <td style="padding: 10px 14px; color: var(--color-mute);">Treated as string replace</td>
+                <td style="padding: 10px 14px; color: #16a34a;">Highlights number vs. string vs. boolean</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section style="margin-bottom: 44px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Step-by-Step: How to Compare Two JSON Files Online
+        </h2>
+        <ol style="font-size: 14.5px; color: var(--color-body); line-height: 1.9; margin: 0; padding-left: 20px;">
+          <li><strong>Paste or Upload JSON A (Before):</strong> Paste your baseline JSON into the left panel or click <em>Upload</em> to load a <code>.json</code> file from your machine.</li>
+          <li><strong>Paste or Upload JSON B (After):</strong> Enter your modified or comparison JSON payload into the right panel.</li>
+          <li><strong>Click "Compare JSON":</strong> Our client-side parser instantly computes the structural delta across all keys, nested arrays, and objects.</li>
+          <li><strong>Inspect Color-Coded Differences:</strong>
+            <ul style="margin: 6px 0 0 0; padding-left: 18px;">
+              <li><span style="color:#16a34a; font-weight:600;">+ Green (Added):</span> Property exists in JSON B but was absent in JSON A.</li>
+              <li><span style="color:#dc2626; font-weight:600;">− Red (Removed):</span> Property was present in JSON A but deleted in JSON B.</li>
+              <li><span style="color:#b45309; font-weight:600;">~ Amber (Changed):</span> Key exists in both objects, but its value or data type was modified.</li>
+            </ul>
+          </li>
+          <li><strong>Copy Exact JSONPaths:</strong> Click or reference any JSONPath string to quickly update your automated tests, schema validations, or API fixtures.</li>
+        </ol>
+      </section>
+
+      <section style="margin-bottom: 44px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Visual Example: Comparing Two API Response Payloads
+        </h2>
+        <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.8; margin: 0 0 14px 0;">
+          Consider two versions of an e-commerce customer record returned by an authentication endpoint:
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; font-family: var(--font-mono, monospace); font-size: 12.5px;">
+          <div style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); padding: 12px;">
+            <div style="font-weight: 600; color: var(--color-ink); margin-bottom: 8px;">JSON A (Original)</div>
+            <pre style="margin: 0; line-height: 1.5; white-space: pre-wrap; color: var(--color-body);">&#123;
+  "userId": 1042,
+  "role": "editor",
+  "verified": true,
+  "preferences": &#123;
+    "theme": "dark"
+  &#125;
+&#125;</pre>
+          </div>
+          <div style="background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); padding: 12px;">
+            <div style="font-weight: 600; color: var(--color-ink); margin-bottom: 8px;">JSON B (Modified)</div>
+            <pre style="margin: 0; line-height: 1.5; white-space: pre-wrap; color: var(--color-body);">&#123;
+  "userId": 1042,
+  "role": "admin",
+  "preferences": &#123;
+    "theme": "dark",
+    "notifications": false
+  &#125;
+&#125;</pre>
+          </div>
+        </div>
+        <p style="font-size: 14px; color: var(--color-body); line-height: 1.7; margin: 0;">
+          QuietJSON detects precisely three changes:
+          <br />• <span style="color:#b45309; font-weight:600;">~ Changed:</span> <code>$.role</code> updated from <code>"editor"</code> to <code>"admin"</code>
+          <br />• <span style="color:#dc2626; font-weight:600;">− Removed:</span> <code>$.verified</code> (was <code>true</code>)
+          <br />• <span style="color:#16a34a; font-weight:600;">+ Added:</span> <code>$.preferences.notifications</code> (set to <code>false</code>)
+        </p>
+      </section>
+
+      <section style="margin-bottom: 44px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Key Use Cases for Software Engineers &amp; QA
+        </h2>
+        <ul style="font-size: 14.5px; color: var(--color-body); line-height: 1.9; margin: 0; padding-left: 20px;">
+          <li><strong>API Regression &amp; Integration Testing:</strong> Compare staging vs. production endpoint responses to ensure schema changes haven't inadvertently dropped critical fields.</li>
+          <li><strong>Microservice Payload Validation:</strong> Diff request payloads when debugging why an upstream service failed to deserialize a message queue record.</li>
+          <li><strong>Kubernetes &amp; Cloud Config Drift:</strong> Spot subtle environment variable, secret, or resource quota changes between deployment manifests.</li>
+          <li><strong>Database Schema Migration Verification:</strong> Diff pre-migration and post-migration NoSQL records (MongoDB, DynamoDB, PostgreSQL JSONB) to confirm data integrity.</li>
+          <li><strong>AI &amp; LLM Output Verification:</strong> Compare structured JSON outputs generated by models across different system prompt iterations or temperature settings.</li>
         </ul>
       </section>
 
-      <section style="margin-bottom: 48px;">
-        <h2 style="font-size: 18px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
-          How to Use
+      <section style="margin-bottom: 44px;">
+        <h2 style="font-size: 20px; font-weight: 600; color: var(--color-ink); margin: 0 0 12px 0;">
+          Privacy Guarantee: 100% In-Browser Execution
         </h2>
-        <ol style="font-size: 14px; color: var(--color-body); line-height: 1.9; margin: 0; padding-left: 20px;">
-          <li>Paste your first JSON into the <strong>JSON A</strong> panel (original / before).</li>
-          <li>Paste your second JSON into the <strong>JSON B</strong> panel (modified / after).</li>
-          <li>Click <strong>Compare JSON</strong>.</li>
-          <li>Review the color-coded diff results below — each entry shows the path and old/new values.</li>
-        </ol>
+        <p style="font-size: 14.5px; color: var(--color-body); line-height: 1.8; margin: 0;">
+          Many developer utilities upload your pasted data to third-party cloud servers for formatting or diffing. QuietJSON is fundamentally different: <strong>your data never leaves your browser</strong>. All recursive tree comparisons, JSONPath evaluations, and formatting algorithms run strictly in your local JavaScript runtime. You can disconnect your internet connection and the diff tool will still function flawlessly.
+        </p>
       </section>
 
       <section style="margin-bottom: 48px;">
@@ -160,8 +267,20 @@ const breadcrumbLd = {
         </div>
       </section>
 
+      <!-- Related Guide — Content Cluster -->
+      <section style="margin-top: 36px; padding: 18px 20px; background: var(--color-canvas-soft); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+        <div>
+          <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--color-link); letter-spacing: 0.5px;">Developer Guide</span>
+          <h3 style="font-size: 14.5px; font-weight: 600; color: var(--color-ink); margin: 3px 0 2px 0;">How to Compare Two JSON Files: The Complete Guide</h3>
+          <p style="font-size: 13px; color: var(--color-body); margin: 0;">Learn why plain text diff tools fail on JSON and how semantic comparison works.</p>
+        </div>
+        <a href="/guides/how-to-compare-two-json-files" style="padding: 6px 14px; font-size: 13px; font-weight: 500; color: var(--color-link); border: 1px solid var(--color-hairline); border-radius: var(--radius-sm); text-decoration: none; background: var(--color-canvas); white-space: nowrap;">
+          Read Guide &rarr;
+        </a>
+      </section>
+
       <!-- Related Tools — internal links for SEO -->
-      <section style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--color-hairline);">
+      <section style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--color-hairline);">
         <p style="font-size: 13px; font-weight: 600; color: var(--color-mute); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 12px 0;">Also try</p>
         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
           <a href="/" style="display: inline-flex; align-items: center; padding: 8px 14px; border: 1px solid var(--color-hairline); border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500; color: var(--color-link); text-decoration: none; background: var(--color-canvas);">JSON Formatter &amp; Validator</a>

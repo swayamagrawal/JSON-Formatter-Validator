@@ -1,4 +1,4 @@
-﻿# QuietJSON
+# QuietJSON
 
 > QuietJSON is a free, 100% client-side JSON toolkit for developers. It formats, validates, minifies, auto-repairs, converts, and diffs JSON data entirely inside the browser — no data is ever uploaded to a server. Built for developers who work with REST APIs, LLM outputs, and data pipelines where privacy matters.
 
@@ -11,6 +11,13 @@ QuietJSON processes all JSON operations using local JavaScript execution in the 
 - [JSON to CSV Converter](https://quietjson.com/json-to-csv): Convert JSON arrays of objects to CSV with dot-notation key flattening for nested objects. Download as .csv file instantly.
 - [JSON to YAML Converter](https://quietjson.com/json-to-yaml): Convert JSON to YAML and YAML to JSON. Bi-directional conversion with clean YAML formatting.
 - [JSON Diff Tool](https://quietjson.com/json-diff): Compare two JSON objects side-by-side. Highlights added, removed, and modified values with full JSONPath references.
+
+## Guides
+
+- [Developer Guides & Tutorials](https://quietjson.com/guides): Hub of technical articles on JSON formatting, comparison, and LLM syntax repair.
+- [How to Compare Two JSON Files](https://quietjson.com/guides/how-to-compare-two-json-files): Comprehensive guide explaining why text diff fails on JSON and how semantic comparison works.
+- [How to Fix JSON from ChatGPT, Claude & Gemini](https://quietjson.com/guides/how-to-fix-json-from-chatgpt): Fix common LLM JSON syntax errors like unquoted keys and Python booleans.
+- [JSON Formatting Guide](https://quietjson.com/guides/json-formatter-guide): How to format, validate, and beautify JSON online.
 
 ## About
 
