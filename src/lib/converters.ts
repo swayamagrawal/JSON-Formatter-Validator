@@ -182,6 +182,189 @@ export function jsonToCsv(jsonString: string): ConversionOutcome {
   }
 }
 
+// ─── CSV → JSON ───────────────────────────────────────────────────────────────
+
+export interface CsvToJsonOptions {
+  parseNumbers?: boolean;
+  parseBooleans?: boolean;
+  trimHeaders?: boolean;
+}
+
+/**
+ * Parse an RFC 4180 compliant CSV string into a 2D array of string cells.
+ * Correctly parses quoted fields with commas, newlines, and escaped quotes ("").
+ */
+function parseCsvRows(input: string): { rows: string[][]; error?: string } {
+  const rows: string[][] = [];
+  let currentRow: string[] = [];
+  let currentField = "";
+  let insideQuotes = false;
+  let i = 0;
+  const len = input.length;
+
+  while (i < len) {
+    const char = input[i];
+
+    if (insideQuotes) {
+      if (char === '"') {
+        if (i + 1 < len && input[i + 1] === '"') {
+          currentField += '"';
+          i += 2;
+          continue;
+        } else {
+          insideQuotes = false;
+          i++;
+          continue;
+        }
+      } else {
+        currentField += char;
+        i++;
+        continue;
+      }
+    } else {
+      if (char === '"') {
+        insideQuotes = true;
+        i++;
+        continue;
+      } else if (char === ',') {
+        currentRow.push(currentField);
+        currentField = "";
+        i++;
+        continue;
+      } else if (char === '\r') {
+        if (i + 1 < len && input[i + 1] === '\n') {
+          i++;
+        }
+        currentRow.push(currentField);
+        rows.push(currentRow);
+        currentRow = [];
+        currentField = "";
+        i++;
+        continue;
+      } else if (char === '\n') {
+        currentRow.push(currentField);
+        rows.push(currentRow);
+        currentRow = [];
+        currentField = "";
+        i++;
+        continue;
+      } else {
+        currentField += char;
+        i++;
+        continue;
+      }
+    }
+  }
+
+  if (insideQuotes) {
+    return { rows: [], error: "CSV syntax error: unclosed quoted string encountered." };
+  }
+
+  if (currentField.length > 0 || currentRow.length > 0) {
+    currentRow.push(currentField);
+    rows.push(currentRow);
+  }
+
+  return { rows };
+}
+
+/** Disambiguate duplicate header names to prevent silent overwriting of column data */
+function disambiguateHeaders(headers: string[], trim = true): string[] {
+  const seenCount = new Map<string, number>();
+  return headers.map((h, idx) => {
+    let headerName = trim ? h.trim() : h;
+    if (!headerName) {
+      headerName = `col_${idx + 1}`;
+    }
+    const count = (seenCount.get(headerName) ?? 0) + 1;
+    seenCount.set(headerName, count);
+    if (count > 1) {
+      return `${headerName}_${count}`;
+    }
+    return headerName;
+  });
+}
+
+/** Infer types for CSV cell values: booleans, null, numbers (preserving unsafe integers as strings) */
+function inferCsvValue(val: string, options?: CsvToJsonOptions): unknown {
+  const parseNumbers = options?.parseNumbers ?? true;
+  const parseBooleans = options?.parseBooleans ?? true;
+
+  if (parseBooleans) {
+    if (val === "true") return true;
+    if (val === "false") return false;
+    if (val === "null") return null;
+  }
+
+  if (parseNumbers && val.trim() !== "") {
+    if (/^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(val)) {
+      if (/^-?\d+$/.test(val)) {
+        try {
+          const big = BigInt(val);
+          const maxSafe = BigInt(Number.MAX_SAFE_INTEGER);
+          const minSafe = BigInt(Number.MIN_SAFE_INTEGER);
+          if (big > maxSafe || big < minSafe) {
+            return val;
+          }
+        } catch {
+          return val;
+        }
+      }
+      const num = Number(val);
+      if (!Number.isNaN(num)) {
+        return num;
+      }
+    }
+  }
+
+  return val;
+}
+
+/**
+ * Convert an RFC 4180 CSV string to a JSON array of objects.
+ * Supports auto-typing (booleans, numbers with safe integer protection),
+ * multiline fields, CRLF, UTF-8 BOM, and duplicate header safety.
+ */
+export function csvToJson(csvString: string, options?: CsvToJsonOptions): ConversionOutcome {
+  let cleanInput = csvString;
+  if (cleanInput.charCodeAt(0) === 0xFEFF) {
+    cleanInput = cleanInput.slice(1);
+  }
+
+  if (!cleanInput.trim()) {
+    return { success: true, output: "[]" };
+  }
+
+  const { rows, error } = parseCsvRows(cleanInput);
+  if (error) {
+    return { success: false, error };
+  }
+
+  if (rows.length === 0) {
+    return { success: true, output: "[]" };
+  }
+
+  const rawHeaders = rows[0]!;
+  const headers = disambiguateHeaders(rawHeaders, options?.trimHeaders ?? true);
+  const dataRows = rows.slice(1);
+
+  const validDataRows = dataRows.filter((r) => r.length > 1 || (r.length === 1 && r[0] !== ""));
+  if (validDataRows.length === 0) {
+    return { success: true, output: "[]" };
+  }
+
+  const records = validDataRows.map((row) => {
+    const obj: Record<string, unknown> = {};
+    headers.forEach((header, idx) => {
+      const cellVal = idx < row.length ? row[idx]! : "";
+      obj[header] = inferCsvValue(cellVal, options);
+    });
+    return obj;
+  });
+
+  return { success: true, output: JSON.stringify(records, null, 2) };
+}
+
 // ─── JSON → YAML ──────────────────────────────────────────────────────────────
 
 /**
@@ -411,4 +594,140 @@ export function jsonDiff(jsonStringA: string, jsonStringB: string): DiffOutcome 
       error: e instanceof Error ? e.message : "Diff failed",
     };
   }
+}
+
+// ─── JSON → TypeScript ────────────────────────────────────────────────────────
+
+export interface TypeScriptOptions {
+  rootName?: string;
+  useExport?: boolean;
+}
+
+const JS_RESERVED_WORDS = new Set([
+  "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete",
+  "do", "else", "export", "extends", "finally", "for", "function", "if", "import", "in",
+  "instanceof", "new", "return", "super", "switch", "this", "throw", "try", "typeof",
+  "var", "void", "while", "with", "yield", "let", "static", "enum", "await", "implements",
+  "package", "protected", "interface", "private", "public"
+]);
+
+function formatPropertyKey(key: string): string {
+  if (/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key) && !JS_RESERVED_WORDS.has(key)) {
+    return key;
+  }
+  return JSON.stringify(key);
+}
+
+function inferType(value: unknown, indentLevel = 0): string {
+  if (value === null) return "null";
+  if (typeof value === "string") return "string";
+  if (typeof value === "number") return "number";
+  if (typeof value === "boolean") return "boolean";
+
+  if (Array.isArray(value)) {
+    if (value.length === 0) return "unknown[]";
+    const isObjArr = value.every((item) => item !== null && typeof item === "object" && !Array.isArray(item));
+    if (isObjArr) {
+      return `Array<${inferObjectArrayType(value as Record<string, unknown>[], indentLevel)}>`;
+    }
+    const types = Array.from(new Set(value.map((v) => inferType(v, indentLevel))));
+    return types.length === 1 ? `${types[0]}[]` : `(${types.join(" | ")})[]`;
+  }
+
+  if (typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>);
+    if (entries.length === 0) return "Record<string, unknown>";
+    const indent = "  ".repeat(indentLevel);
+    const childIndent = "  ".repeat(indentLevel + 1);
+    const lines = entries.map(([k, v]) => {
+      const propKey = formatPropertyKey(k);
+      const propType = inferType(v, indentLevel + 1);
+      return `${childIndent}${propKey}: ${propType};`;
+    });
+    return `{\n${lines.join("\n")}\n${indent}}`;
+  }
+
+  return "unknown";
+}
+
+function inferObjectArrayType(
+  arr: Record<string, unknown>[],
+  indentLevel = 0
+): string {
+  const allKeys = Array.from(new Set(arr.flatMap((item) => Object.keys(item))));
+  if (allKeys.length === 0) return "Record<string, unknown>";
+
+  const indent = "  ".repeat(indentLevel);
+  const childIndent = "  ".repeat(indentLevel + 1);
+
+  const lines = allKeys.map((key) => {
+    const isOptional = arr.some((item) => !(key in item));
+    const values = arr.map((item) => item[key]).filter((v) => v !== undefined);
+    const types = Array.from(new Set(values.map((v) => inferType(v, indentLevel + 1))));
+    const typeStr = types.length === 0 ? "unknown" : types.length === 1 ? types[0]! : `(${types.join(" | ")})`;
+    const propKey = formatPropertyKey(key) + (isOptional ? "?" : "");
+    return `${childIndent}${propKey}: ${typeStr};`;
+  });
+
+  return `{\n${lines.join("\n")}\n${indent}}`;
+}
+
+/**
+ * Convert JSON input into idiomatic TypeScript interface/type definitions.
+ * Handles nested objects, primitive and mixed arrays, object arrays with optional
+ * property detection, identifier sanitization, and customizable root names.
+ */
+export function jsonToTypeScript(
+  jsonString: string,
+  options?: TypeScriptOptions
+): ConversionOutcome {
+  const trimmed = jsonString.trim();
+  if (!trimmed) {
+    return { success: false, error: "JSON input is empty" };
+  }
+
+  let parsed: JsonValue;
+  try {
+    parsed = safeParse(trimmed, "JSON");
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Invalid JSON" };
+  }
+
+  const rootName = options?.rootName?.trim() || "RootObject";
+  const prefix = options?.useExport !== false ? "export " : "";
+
+  if (Array.isArray(parsed)) {
+    if (parsed.length === 0) {
+      return { success: true, output: `${prefix}type ${rootName} = unknown[];\n` };
+    }
+    const isObjectArray = parsed.every((item) => item !== null && typeof item === "object" && !Array.isArray(item));
+    if (isObjectArray) {
+      const inner = inferObjectArrayType(parsed as Record<string, unknown>[], 0);
+      return { success: true, output: `${prefix}type ${rootName} = Array<${inner}>;\n` };
+    }
+    const elemTypes = Array.from(new Set(parsed.map((item) => inferType(item, 0))));
+    const elemTypeStr = elemTypes.length === 1 ? `${elemTypes[0]}[]` : `(${elemTypes.join(" | ")})[]`;
+    return { success: true, output: `${prefix}type ${rootName} = ${elemTypeStr};\n` };
+  }
+
+  if (parsed !== null && typeof parsed === "object") {
+    const entries = Object.entries(parsed as Record<string, unknown>);
+    if (entries.length === 0) {
+      return { success: true, output: `${prefix}interface ${rootName} {}\n` };
+    }
+    const lines = entries.map(([key, value]) => {
+      const propKey = formatPropertyKey(key);
+      const propType = inferType(value, 1);
+      return `  ${propKey}: ${propType};`;
+    });
+    return {
+      success: true,
+      output: `${prefix}interface ${rootName} {\n${lines.join("\n")}\n}\n`,
+    };
+  }
+
+  return {
+    success: true,
+    output: `${prefix}type ${rootName} = ${inferType(parsed, 0)};\n`,
+  };
 }

@@ -495,7 +495,19 @@ export function formatJSON(input: string, indent: number | "tab" = 2): FormatRes
     const indentStr = indent === "tab" ? "\t" : indent;
     return { success: true, output: JSON.stringify(parsed, null, indentStr) };
   } catch (e) {
-    // Try to get error location from the native error message
+    // Check if validateJSON provides a rich diagnostic (e.g. Python literal, HTML, etc.)
+    const valResult = validateJSON(trimmed);
+    if (!valResult.valid) {
+      return {
+        success: false,
+        error: valResult.message,
+        line: valResult.line,
+        column: valResult.column,
+        offset: valResult.offset,
+      };
+    }
+
+    // Fallback: try to get error location from the native error message
     const { line, column, offset } = extractErrorLocation(e, trimmed);
     return {
       success: false,
@@ -542,6 +554,17 @@ export function minifyJSON(input: string): FormatResult {
     const parsed = JSON.parse(trimmed);
     return { success: true, output: JSON.stringify(parsed) };
   } catch (e) {
+    const valResult = validateJSON(trimmed);
+    if (!valResult.valid) {
+      return {
+        success: false,
+        error: valResult.message,
+        line: valResult.line,
+        column: valResult.column,
+        offset: valResult.offset,
+      };
+    }
+
     const { line, column, offset } = extractErrorLocation(e, trimmed);
     return {
       success: false,
@@ -554,28 +577,173 @@ export function minifyJSON(input: string): FormatResult {
 }
 
 /**
- * Count lines, characters, and top-level keys in JSON
+ * Sort JSON keys alphabetically and format with indentation.
+ * Recursively sorts keys within all objects while strictly preserving array element orders.
+ * Rejects input with duplicate keys or unsafe integers to prevent silent data loss or rounding.
  */
-export function getStats(input: string): { lines: number; chars: number; keys: number | null; bytes: number; isArray: boolean } {
+export function sortJsonKeys(input: string, indent: number | "tab" = 2): FormatResult {
+  const trimmed = input.trim();
+  if (!trimmed) return { success: true, output: "" };
+
+  if (isHtmlResponse(trimmed)) {
+    const offset = input.indexOf(trimmed);
+    const { line, column } = offsetToLineCol(input, offset);
+    return {
+      success: false,
+      error: HTML_ERROR_MESSAGE,
+      line,
+      column,
+      offset,
+    };
+  }
+
+  const dupKeys = findDuplicateKeys(trimmed);
+  if (dupKeys.length > 0) {
+    const d = dupKeys[0]!;
+    return {
+      success: false,
+      error: `Cannot sort JSON keys: Duplicate key "${d.key}" detected at line ${d.line}, column ${d.column}. Sorting keys on objects with duplicate keys would silently delete duplicate values.`,
+      line: d.line,
+      column: d.column,
+      offset: d.offset,
+    };
+  }
+
+  const unsafeInts = findUnsafeIntegers(trimmed);
+  if (unsafeInts.length > 0) {
+    const u = unsafeInts[0]!;
+    return {
+      success: false,
+      error: `Cannot safely sort JSON keys: integer ${u.value} exceeds JavaScript's safe integer limit (${Number.MAX_SAFE_INTEGER}) and will lose precision. Store large IDs as strings to preserve precision.`,
+      line: u.line,
+      column: u.column,
+      offset: u.offset,
+    };
+  }
+
+  const valResult = validateJSON(trimmed);
+  if (!valResult.valid) {
+    return {
+      success: false,
+      error: valResult.message,
+      line: valResult.line,
+      column: valResult.column,
+      offset: valResult.offset,
+    };
+  }
+
+  try {
+    const parsed = JSON.parse(trimmed);
+
+    function sortValue(val: unknown): unknown {
+      if (val === null || typeof val !== "object") {
+        return val;
+      }
+      if (Array.isArray(val)) {
+        return val.map(sortValue);
+      }
+      const record = val as Record<string, unknown>;
+      const sortedKeys = Object.keys(record).sort();
+      const sortedObj: Record<string, unknown> = {};
+      for (const key of sortedKeys) {
+        sortedObj[key] = sortValue(record[key]);
+      }
+      return sortedObj;
+    }
+
+    const sorted = sortValue(parsed);
+    const indentStr = indent === "tab" ? "\t" : indent;
+    return { success: true, output: JSON.stringify(sorted, null, indentStr) };
+  } catch (e) {
+    const { line, column, offset } = extractErrorLocation(e, trimmed);
+    return {
+      success: false,
+      error: e instanceof Error ? e.message : "Invalid JSON",
+      line,
+      column,
+      offset,
+    };
+  }
+}
+
+export interface JsonStats {
+  lines: number;
+  chars: number;
+  bytes: number;
+  keys: number | null;
+  isArray: boolean;
+  objectCount: number;
+  arrayCount: number;
+  keyCount: number;
+  maxDepth: number;
+  elementCount: number;
+}
+
+/**
+ * Compute comprehensive document statistics using parseTree AST traversal.
+ * Calculates lines, characters, bytes, root keys/elements, total objects,
+ * total arrays, total properties, maximum nesting depth, and total array elements.
+ */
+export function getStats(input: string): JsonStats {
   const lines = input ? input.split("\n").length : 0;
   const chars = input.length;
   const bytes = new TextEncoder().encode(input).length;
 
   let keys: number | null = null;
   let isArray = false;
-  try {
-    const parsed = JSON.parse(input);
-    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-      keys = Object.keys(parsed).length;
-    } else if (Array.isArray(parsed)) {
-      keys = parsed.length; // array length instead
-      isArray = true;
-    }
-  } catch {
-    // not valid JSON — no key count
+  let objectCount = 0;
+  let arrayCount = 0;
+  let keyCount = 0;
+  let elementCount = 0;
+  let maxDepth = 0;
+
+  if (!input.trim()) {
+    return { lines, chars, bytes, keys, isArray, objectCount, arrayCount, keyCount, maxDepth, elementCount };
   }
 
-  return { lines, chars, keys, bytes, isArray };
+  const errors: ParseError[] = [];
+  const root = parseTree(input, errors, { allowTrailingComma: false, disallowComments: true });
+
+  if (root && errors.length === 0) {
+    function walk(node: Node, depth: number) {
+      if (depth > maxDepth) {
+        maxDepth = depth;
+      }
+
+      if (node.type === "object") {
+        objectCount++;
+        if (node.children) {
+          for (const prop of node.children) {
+            if (prop.type === "property" && prop.children) {
+              keyCount++;
+              if (prop.children[1]) {
+                walk(prop.children[1], depth + 1);
+              }
+            }
+          }
+        }
+      } else if (node.type === "array") {
+        arrayCount++;
+        if (node.children) {
+          elementCount += node.children.length;
+          for (const child of node.children) {
+            walk(child, depth + 1);
+          }
+        }
+      }
+    }
+
+    walk(root, 1);
+
+    if (root.type === "object") {
+      keys = root.children ? root.children.length : 0;
+    } else if (root.type === "array") {
+      keys = root.children ? root.children.length : 0;
+      isArray = true;
+    }
+  }
+
+  return { lines, chars, bytes, keys, isArray, objectCount, arrayCount, keyCount, maxDepth, elementCount };
 }
 
 /** Format bytes to human-readable */

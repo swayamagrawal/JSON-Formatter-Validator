@@ -34,6 +34,7 @@ import type { ParseError } from "jsonc-parser";
 import {
   formatJSON,
   minifyJSON,
+  sortJsonKeys,
   getStats,
   formatBytes,
   findDuplicateKeys,
@@ -537,6 +538,24 @@ export default function JsonEditor({ initialInput, inputPlaceholder }: JsonEdito
     }
   }
 
+  // ── Sort Keys ─────────────────────────────────────────────────────────────
+  function handleSortKeys() {
+    if (!input.trim()) return;
+    const result = sortJsonKeys(input, indent);
+    if (result.success) {
+      setOutput(result.output);
+      setStatus({ type: "valid" });
+      setFormatError(null);
+    } else {
+      setOutput("");
+      setStatus({ type: "error", message: result.error, line: result.line, column: result.column });
+      setFormatError({ message: result.error, line: result.line, column: result.column });
+      if (result.error.includes("safe integer limit") || result.error.includes("Duplicate key")) {
+        showToast({ kind: "warning", message: result.error });
+      }
+    }
+  }
+
   // ── Repair ───────────────────────────────────────────────────────────────
   function handleRepair() {
     if (!input.trim()) return;
@@ -676,6 +695,9 @@ export default function JsonEditor({ initialInput, inputPlaceholder }: JsonEdito
           </ToolbarButton>
           <ToolbarButton onClick={handleMinify} title="Ctrl+M">
             Minify
+          </ToolbarButton>
+          <ToolbarButton onClick={handleSortKeys} title="Sort object keys alphabetically">
+            Sort Keys
           </ToolbarButton>
           {/* Repair button — amber accent to distinguish it as a "fix" action */}
           <ToolbarButton onClick={handleRepair} accent="amber" title="Auto-repair broken JSON">
@@ -1015,6 +1037,15 @@ export default function JsonEditor({ initialInput, inputPlaceholder }: JsonEdito
             {stats.keys !== null && (
               <StatItem label={stats.isArray ? "Items" : "Keys"} value={String(stats.keys)} />
             )}
+            {stats.maxDepth > 0 && (
+              <StatItem className="stat-detail" label="Depth" value={String(stats.maxDepth)} />
+            )}
+            {stats.objectCount > 0 && (
+              <StatItem className="stat-detail" label="Objects" value={String(stats.objectCount)} />
+            )}
+            {stats.arrayCount > 0 && (
+              <StatItem className="stat-detail" label="Arrays" value={String(stats.arrayCount)} />
+            )}
           </>
         )}
 
@@ -1025,6 +1056,9 @@ export default function JsonEditor({ initialInput, inputPlaceholder }: JsonEdito
 
       {/* Responsive CSS */}
       <style>{`
+        @media (max-width: 960px) {
+          .stat-detail { display: none !important; }
+        }
         @media (max-width: 768px) {
           .editor-grid { grid-template-columns: 1fr !important; }
           .shortcut-hints { display: none !important; }
@@ -1227,9 +1261,9 @@ function StatDivider() {
   );
 }
 
-function StatItem({ label, value }: { label: string; value: string }) {
+function StatItem({ label, value, className }: { label: string; value: string; className?: string }) {
   return (
-    <span style={{ color: "var(--color-mute)" }}>
+    <span class={className} style={{ color: "var(--color-mute)" }}>
       <span style={{ color: "var(--color-body)" }}>{value}</span> {label}
     </span>
   );

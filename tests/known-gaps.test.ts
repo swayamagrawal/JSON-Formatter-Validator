@@ -84,4 +84,16 @@ describe("Known Capability Gaps - Current Baseline Characterization", () => {
       expect(result.message).toMatch(/API|URL|error/i);
     }
   });
+
+  it("GAP-A1 (RESOLVED in Master Sprint): formatJSON preserves Python literal diagnostic instead of raw V8 error", () => {
+    const input = '{"active": True}';
+    const fmtResult = formatJSON(input);
+
+    expect(fmtResult.success).toBe(false);
+    if (!fmtResult.success) {
+      expect(fmtResult.error).toContain("Invalid Python-style literal 'True'");
+      expect(fmtResult.error).toContain("booleans must be lowercase 'true'");
+      expect(fmtResult.error).not.toMatch(/Unexpected token 'T'/);
+    }
+  });
 });

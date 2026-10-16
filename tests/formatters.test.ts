@@ -11,6 +11,7 @@ import {
   detectPythonLiteral,
   isKeyPosition,
   formatJsonErrorMessage,
+  sortJsonKeys,
 } from "../src/lib/formatters";
 
 describe("formatters.ts - Validation and Formatting Utilities", () => {
@@ -664,6 +665,29 @@ describe("formatters.ts - Validation and Formatting Utilities", () => {
         expect(result.output).toContain("1234567890123456");
       }
     });
+
+    it("GAP-A1: preserves contextual Python literal diagnostics when formatting fails", () => {
+      const input = '{\n  "active": True,\n  "deleted": False,\n  "value": None\n}';
+      const result = formatJSON(input);
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toContain("Invalid Python-style literal 'True'");
+        expect(result.error).toContain("booleans must be lowercase 'true'");
+        expect(result.error).toContain("Click 'Try Repair' to auto-fix");
+      }
+    });
+
+    it("GAP-A1: preserves Python literal object key diagnostic when formatting fails", () => {
+      const input = '{\n  True: 1\n}';
+      const result = formatJSON(input);
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toContain("Invalid unquoted Python literal 'True' used as an object key");
+        expect(result.error).toContain("object keys must be double-quoted strings");
+      }
+    });
   });
 
   describe("minifyJSON", () => {
@@ -745,6 +769,53 @@ describe("formatters.ts - Validation and Formatting Utilities", () => {
       expect(stats.bytes).toBe(0);
       expect(stats.keys).toBeNull();
       expect(stats.isArray).toBe(false);
+      expect(stats.objectCount).toBe(0);
+      expect(stats.arrayCount).toBe(0);
+      expect(stats.keyCount).toBe(0);
+      expect(stats.maxDepth).toBe(0);
+      expect(stats.elementCount).toBe(0);
+    });
+
+    it("computes rich metrics for complex nested JSON structures", () => {
+      const input = JSON.stringify({
+        store: {
+          books: [
+            { title: "A", price: 10 },
+            { title: "B", price: 20 }
+          ],
+          location: "NY"
+        },
+        active: true
+      });
+      const stats = getStats(input);
+
+      expect(stats.objectCount).toBe(4); // root, store, book1, book2
+      expect(stats.arrayCount).toBe(1);  // books array
+      expect(stats.keyCount).toBe(8);    // store, active, books, location, title, price, title, price
+      expect(stats.elementCount).toBe(2); // 2 items in books array
+      expect(stats.maxDepth).toBe(5);    // root -> store -> books -> book1 -> title
+    });
+
+    it("computes stats for nested arrays and primitive values", () => {
+      const input = '[[1, 2], [3, [4, 5]]]';
+      const stats = getStats(input);
+
+      expect(stats.objectCount).toBe(0);
+      expect(stats.arrayCount).toBe(4);
+      expect(stats.keyCount).toBe(0);
+      expect(stats.elementCount).toBe(8); // root (2) + [1,2] (2) + [3,[4,5]] (2) + [4,5] (2)
+      expect(stats.maxDepth).toBe(4);
+      expect(stats.isArray).toBe(true);
+    });
+
+    it("returns zeros for rich metrics on invalid JSON", () => {
+      const stats = getStats("{ not valid json");
+      expect(stats.objectCount).toBe(0);
+      expect(stats.arrayCount).toBe(0);
+      expect(stats.keyCount).toBe(0);
+      expect(stats.maxDepth).toBe(0);
+      expect(stats.elementCount).toBe(0);
+      expect(stats.keys).toBeNull();
     });
   });
 
@@ -757,4 +828,131 @@ describe("formatters.ts - Validation and Formatting Utilities", () => {
       expect(formatBytes(5242880)).toBe("5.0 MB");
     });
   });
+
+  describe("sortJsonKeys", () => {
+    it("handles empty or whitespace-only input safely", () => {
+      expect(sortJsonKeys("")).toEqual({ success: true, output: "" });
+      expect(sortJsonKeys("   \n\t  ")).toEqual({ success: true, output: "" });
+    });
+
+    it("alphabetically sorts top-level object keys", () => {
+      const input = '{"z": 1, "a": 2, "m": 3}';
+      const result = sortJsonKeys(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(JSON.parse(result.output)).toEqual({ a: 2, m: 3, z: 1 });
+        const keys = Object.keys(JSON.parse(result.output));
+        expect(keys).toEqual(["a", "m", "z"]);
+        expect(result.output).toBe('{\n  "a": 2,\n  "m": 3,\n  "z": 1\n}');
+      }
+    });
+
+    it("recursively sorts keys in nested objects", () => {
+      const input = JSON.stringify({
+        zebra: { beta: 1, alpha: 2 },
+        apple: { z: 9, a: 8 }
+      });
+      const result = sortJsonKeys(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        const expected = '{\n  "apple": {\n    "a": 8,\n    "z": 9\n  },\n  "zebra": {\n    "alpha": 2,\n    "beta": 1\n  }\n}';
+        expect(result.output).toBe(expected);
+      }
+    });
+
+    it("preserves array element order while sorting object keys inside arrays", () => {
+      const input = JSON.stringify([
+        { b: 2, a: 1 },
+        [3, 1, 2],
+        { d: 4, c: 3 }
+      ]);
+      const result = sortJsonKeys(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        const parsed = JSON.parse(result.output);
+        expect(Object.keys(parsed[0])).toEqual(["a", "b"]);
+        expect(parsed[1]).toEqual([3, 1, 2]); // Array elements untouched
+        expect(Object.keys(parsed[2])).toEqual(["c", "d"]);
+      }
+    });
+
+    it("preserves primitives, null, booleans, and empty collections", () => {
+      const input = JSON.stringify({
+        z: null,
+        y: true,
+        x: false,
+        w: "",
+        v: 0,
+        u: [],
+        t: {}
+      });
+      const result = sortJsonKeys(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        const keys = Object.keys(JSON.parse(result.output));
+        expect(keys).toEqual(["t", "u", "v", "w", "x", "y", "z"]);
+      }
+    });
+
+    it("supports custom indentation (4 spaces and tab)", () => {
+      const input = '{"b": 1, "a": 2}';
+      const result4 = sortJsonKeys(input, 4);
+      expect(result4.success).toBe(true);
+      if (result4.success) {
+        expect(result4.output).toBe('{\n    "a": 2,\n    "b": 1\n}');
+      }
+
+      const resultTab = sortJsonKeys(input, "tab");
+      expect(resultTab.success).toBe(true);
+      if (resultTab.success) {
+        expect(resultTab.output).toBe('{\n\t"a": 2,\n\t"b": 1\n}');
+      }
+    });
+
+    it("safely handles primitive root values", () => {
+      expect(sortJsonKeys("42")).toEqual({ success: true, output: "42" });
+      expect(sortJsonKeys('"hello"')).toEqual({ success: true, output: '"hello"' });
+      expect(sortJsonKeys("true")).toEqual({ success: true, output: "true" });
+      expect(sortJsonKeys("null")).toEqual({ success: true, output: "null" });
+    });
+
+    it("refuses to sort when duplicate keys exist in the same object to prevent silent data loss", () => {
+      const input = '{\n  "name": "First",\n  "name": "Second"\n}';
+      const result = sortJsonKeys(input);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toContain("Duplicate key");
+      }
+    });
+
+    it("refuses to sort when unsafe integers exceed JavaScript safe precision limits", () => {
+      const input = '{\n  "b": 1,\n  "id": 9007199254740993\n}';
+      const result = sortJsonKeys(input);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toContain("exceeds JavaScript's safe integer limit");
+        expect(result.error).toContain("9007199254740993");
+      }
+    });
+
+    it("detects HTML documents and rejects them", () => {
+      const input = "<!DOCTYPE html><html><body>Error 404</body></html>";
+      const result = sortJsonKeys(input);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toContain("Input appears to be an HTML document");
+      }
+    });
+
+    it("returns descriptive error and coordinates on invalid JSON syntax", () => {
+      const input = '{\n  "a": 1\n  "b": 2\n}';
+      const result = sortJsonKeys(input);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.line).toBeGreaterThanOrEqual(1);
+        expect(result.column).toBeGreaterThanOrEqual(1);
+      }
+    });
+  });
 });
+

@@ -1,9 +1,11 @@
 import { describe, it, expect } from "vitest";
 import {
   jsonToCsv,
+  csvToJson,
   jsonToYaml,
   yamlToJson,
   jsonDiff,
+  jsonToTypeScript,
 } from "../src/lib/converters";
 
 describe("converters.ts - Conversion and Diff Utilities", () => {
@@ -640,4 +642,297 @@ tildeNull: ~
       }
     });
   });
+
+  describe("csvToJson", () => {
+    it("handles empty and whitespace-only input safely", () => {
+      expect(csvToJson("")).toEqual({ success: true, output: "[]" });
+      expect(csvToJson("   \n\r\t  ")).toEqual({ success: true, output: "[]" });
+    });
+
+    it("returns empty array for CSV with header only", () => {
+      const result = csvToJson("id,name,role");
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.output).toBe("[]");
+      }
+    });
+
+    it("converts simple CSV table to JSON array of objects with inferred types", () => {
+      const input = "id,name,age,active\n1,Alice,30,true\n2,Bob,25,false";
+      const result = csvToJson(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        const parsed = JSON.parse(result.output);
+        expect(parsed).toEqual([
+          { id: 1, name: "Alice", age: 30, active: true },
+          { id: 2, name: "Bob", age: 25, active: false },
+        ]);
+      }
+    });
+
+    it("handles RFC 4180 quoted fields containing commas", () => {
+      const input = 'name,address\n"Doe, John","123 Main St, Apt 4"';
+      const result = csvToJson(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        const parsed = JSON.parse(result.output);
+        expect(parsed).toEqual([
+          { name: "Doe, John", address: "123 Main St, Apt 4" },
+        ]);
+      }
+    });
+
+    it("handles RFC 4180 escaped quotes inside quoted fields", () => {
+      const input = 'name,quote\nAlice,"She said ""Hello world!"""';
+      const result = csvToJson(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        const parsed = JSON.parse(result.output);
+        expect(parsed).toEqual([
+          { name: "Alice", quote: 'She said "Hello world!"' },
+        ]);
+      }
+    });
+
+    it("handles RFC 4180 multiline fields with embedded newlines", () => {
+      const input = 'id,notes\n1,"Line 1\nLine 2\nLine 3"';
+      const result = csvToJson(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        const parsed = JSON.parse(result.output);
+        expect(parsed).toEqual([
+          { id: 1, notes: "Line 1\nLine 2\nLine 3" },
+        ]);
+      }
+    });
+
+    it("supports Windows CRLF line endings", () => {
+      const input = "id,name\r\n10,Alice\r\n20,Bob";
+      const result = csvToJson(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        const parsed = JSON.parse(result.output);
+        expect(parsed).toEqual([
+          { id: 10, name: "Alice" },
+          { id: 20, name: "Bob" },
+        ]);
+      }
+    });
+
+    it("strips UTF-8 Byte Order Mark (BOM) from headers", () => {
+      const input = "\uFEFFid,name\n1,Alice";
+      const result = csvToJson(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        const parsed = JSON.parse(result.output);
+        expect(Object.keys(parsed[0])).toEqual(["id", "name"]);
+      }
+    });
+
+    it("safely disambiguates duplicate header column names to prevent data loss", () => {
+      const input = "id,score,score\n1,95,99";
+      const result = csvToJson(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        const parsed = JSON.parse(result.output);
+        expect(parsed[0]).toEqual({
+          id: 1,
+          score: 95,
+          score_2: 99,
+        });
+      }
+    });
+
+    it("handles rows with fewer fields gracefully by padding with empty strings", () => {
+      const input = "name,role,department\nAlice,Manager\nBob,Engineer,QA";
+      const result = csvToJson(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        const parsed = JSON.parse(result.output);
+        expect(parsed[0]).toEqual({
+          name: "Alice",
+          role: "Manager",
+          department: "",
+        });
+        expect(parsed[1]).toEqual({
+          name: "Bob",
+          role: "Engineer",
+          department: "QA",
+        });
+      }
+    });
+
+    it("preserves large integer IDs exceeding 2^53-1 as strings to avoid precision loss", () => {
+      const input = "id,accountId,amount\n1,9007199254740993,500";
+      const result = csvToJson(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        const parsed = JSON.parse(result.output);
+        expect(parsed[0].accountId).toBe("9007199254740993");
+        expect(typeof parsed[0].accountId).toBe("string");
+        expect(parsed[0].amount).toBe(500);
+      }
+    });
+
+    it("supports parseNumbers: false and parseBooleans: false options to keep strings", () => {
+      const input = "id,active,count\n1,true,42";
+      const result = csvToJson(input, { parseNumbers: false, parseBooleans: false });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        const parsed = JSON.parse(result.output);
+        expect(parsed[0]).toEqual({
+          id: "1",
+          active: "true",
+          count: "42",
+        });
+      }
+    });
+
+    it("reports an error for unclosed quoted strings", () => {
+      const input = 'name,notes\nAlice,"unclosed string without closing quote';
+      const result = csvToJson(input);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toMatch(/unclosed|quote/i);
+      }
+    });
+  });
+
+  describe("jsonToTypeScript", () => {
+    it("rejects empty or whitespace-only input with a helpful error", () => {
+      const result = jsonToTypeScript("");
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toMatch(/empty/i);
+      }
+    });
+
+    it("generates TypeScript interface for a flat JSON object", () => {
+      const input = JSON.stringify({
+        id: 101,
+        name: "QuietJSON",
+        active: true,
+        meta: null,
+      });
+      const result = jsonToTypeScript(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.output).toContain("export interface RootObject {");
+        expect(result.output).toContain("id: number;");
+        expect(result.output).toContain("name: string;");
+        expect(result.output).toContain("active: boolean;");
+        expect(result.output).toContain("meta: null;");
+      }
+    });
+
+    it("generates formatted type definitions for nested objects", () => {
+      const input = JSON.stringify({
+        user: {
+          name: "Alice",
+          profile: {
+            bio: "Engineer",
+            age: 28,
+          },
+        },
+      });
+      const result = jsonToTypeScript(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.output).toContain("user: {");
+        expect(result.output).toContain("name: string;");
+        expect(result.output).toContain("profile: {");
+        expect(result.output).toContain("bio: string;");
+        expect(result.output).toContain("age: number;");
+      }
+    });
+
+    it("generates correct array types for primitive and empty arrays", () => {
+      const input = JSON.stringify({
+        tags: ["alpha", "beta"],
+        counts: [1, 2, 3],
+        flags: [true, false],
+        emptyList: [],
+      });
+      const result = jsonToTypeScript(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.output).toContain("tags: string[];");
+        expect(result.output).toContain("counts: number[];");
+        expect(result.output).toContain("flags: boolean[];");
+        expect(result.output).toContain("emptyList: unknown[];");
+      }
+    });
+
+    it("infers unified types and marks optional properties for object arrays", () => {
+      const input = JSON.stringify({
+        users: [
+          { id: 1, name: "Alice" },
+          { id: 2, name: "Bob", email: "bob@example.com" },
+        ],
+      });
+      const result = jsonToTypeScript(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.output).toContain("id: number;");
+        expect(result.output).toContain("name: string;");
+        expect(result.output).toContain("email?: string;");
+      }
+    });
+
+    it("handles root JSON arrays cleanly", () => {
+      const input = JSON.stringify([
+        { id: 1, title: "Post 1" },
+        { id: 2, title: "Post 2" },
+      ]);
+      const result = jsonToTypeScript(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.output).toContain("export type RootObject = Array<{");
+        expect(result.output).toContain("id: number;");
+        expect(result.output).toContain("title: string;");
+      }
+    });
+
+    it("quotes property names that are not valid JavaScript identifiers", () => {
+      const input = JSON.stringify({
+        "first-name": "Alice",
+        "123": 456,
+        "default": "keyword",
+        valid_ident: true,
+      });
+      const result = jsonToTypeScript(input);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.output).toContain('"first-name": string;');
+        expect(result.output).toContain('"123": number;');
+        expect(result.output).toContain('"default": string;');
+        expect(result.output).toContain("valid_ident: boolean;");
+      }
+    });
+
+    it("supports custom root interface name and disabling export keyword", () => {
+      const input = '{"status": "ok"}';
+      const result = jsonToTypeScript(input, {
+        rootName: "ApiResponse",
+        useExport: false,
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.output).toContain("interface ApiResponse {");
+        expect(result.output).not.toContain("export interface");
+        expect(result.output).toContain("status: string;");
+      }
+    });
+
+    it("reports an error for invalid JSON syntax with location", () => {
+      const input = '{\n  "broken": \n}';
+      const result = jsonToTypeScript(input);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toMatch(/invalid|unexpected|syntax/i);
+      }
+    });
+  });
 });
+
+
