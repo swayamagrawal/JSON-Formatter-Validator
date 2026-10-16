@@ -1,4 +1,4 @@
-﻿---
+---
 // src/pages/guides/index.astro
 import Layout from "../../layouts/Layout.astro";
 
@@ -43,7 +43,7 @@ const breadcrumbLd = {
 <Layout title={pageTitle} description={pageDesc} canonical={canonical}>
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} />
 
-  <div class="max-w-3xl mx-auto px-4 sm:px-6 pt-6 pb-16">
+  <div style="max-width: 760px; width: 100%; margin: 0 auto; padding: 24px 16px 64px; box-sizing: border-box;">
     <nav style="font-size: 13px; color: var(--color-mute); margin-bottom: 20px;">
       <a href="/" style="color: var(--color-link); text-decoration: none;">Home</a>
       <span style="margin: 0 6px;">&#8250;</span>
